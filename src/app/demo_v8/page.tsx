@@ -8,7 +8,7 @@ import YoloCamera from "./components/YoloCamera";
 
 export default function App() {
   return (
-    <main className="flex w-screen h-screen flex-col items-center justify-between">
+    <main className="flex w-screen h-screen flex-col items-center justify-between relative">
       <YoloCamera />
     </main>
   );

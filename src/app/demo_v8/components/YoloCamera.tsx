@@ -7,8 +7,10 @@ import { InferenceBox, InferenceSessionSet } from "@/utils/types";
 import { labels } from "@/yolo/label";
 
 export default function YoloCamera() {
+  // element sizes
   const [elementWidth, setElementWidth] = useState<number>(0);
   const [elementHeight, setElementHeight] = useState<number>(0);
+
   // cameras
   const [cameras, setCameras] = useState<Array<MediaDeviceInfo>>([]);
   const [camera, setCamera] = useState<MediaDeviceInfo | null>(null);
@@ -22,7 +24,11 @@ export default function YoloCamera() {
   const [inferenceCount, setInferenceCount] = useState<number>(0);
   const [session, setSession] = useState<InferenceSessionSet | null>(null);
   const [resultBoxes, setResultBoxes] = useState<InferenceBox[]>([]);
+  const [resultLabelHistory, setResultLabelHistory] = useState<string[][]>([
+    [],
+  ]);
 
+  // refs
   const containerRef = useRef<HTMLDivElement>(null);
   const webcamRef = useRef<Webcam>(null);
   const cameraCanvasRef = useRef<HTMLCanvasElement>(null);
@@ -83,10 +89,17 @@ export default function YoloCamera() {
     if (cameraCanvasRef.current === null || session === null) return;
     detectImage(cameraCanvasRef.current, session, modelInputShape).then(
       (boxes) => {
+        if (boxes.length === 0) return;
         console.log(
           `${inferenceCount}: objects`,
           boxes.map((b) => labels[b.labelIndex])
         );
+        setResultLabelHistory((prev) => {
+          const newHistory = [...prev];
+          newHistory.push(boxes.map((b) => labels[b.labelIndex]));
+          if (newHistory.length > 10) newHistory.shift();
+          return newHistory;
+        });
         setInferenceCount((prev) => prev + 1);
         setResultBoxes(boxes);
       }
@@ -165,6 +178,31 @@ export default function YoloCamera() {
         width={elementWidth}
         height={elementHeight}
       />
+      <section className="absolute top-0 right-0 h-screen flex justify-start flex-col p-4 gap-2">
+        {resultLabelHistory.map((labels, i) => (
+          <div
+            key={i}
+            className="flex flex-col items-center p-2"
+            style={{
+              backgroundColor: "rgba(0, 0, 0, 0.3)",
+              backdropFilter: "blur(5px)",
+              borderRadius: "0.5rem",
+            }}
+          >
+            {labels.map((label, j) => (
+              <p
+                key={j}
+                style={{
+                  fontSize: "12px",
+                  color: "#dddddd",
+                }}
+              >
+                [{inferenceCount - 10 + i}] detected: {label}
+              </p>
+            ))}
+          </div>
+        ))}
+      </section>
     </div>
   );
 }
