@@ -5,6 +5,11 @@
 > この庭では、人工物、自然物、肉体が等価に存在し、「庭師」たちによってそれぞれが互いに”接木”され、侵犯し合う。それぞれのオブジェクトは、互いが互いを義肢とし、やがて人間さえも植物や機械の義肢となることで、オブジェクト同士の関係は氾濫し、この人間社会において定義づけられた機能や存在意義を逸脱した可能性のキメラとして癒着する。そして、それらが矛盾しながら調整しあうことで共存し、その庭は造られ続ける。  
 In this garden, artifacts, natural objects, and bodies exist in equal measure, each "grafted" onto the other by the "gardeners" and invading each other. Each object becomes a prosthesis for the other, and eventually, even human beings become prostheses for plants and machines. And as these objects coexist by contradicting and adjusting to each other, the garden continues to be created.
 
+## refs
+
+- <https://github.com/microsoft/onnxruntime/blob/main/samples/nodejs/04_create-inference-session/index.js>
+- <https://github.com/akbartus/Yolov8-Object-Detection-on-Browser/blob/main/js/main.js>
+
 ---
 
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
