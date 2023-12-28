@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import Webcam from "react-webcam";
 import * as ort from "onnxruntime-web";
 import { InferenceBox, InferenceSessionSet } from "@/utils/types";
+import { labels } from "@/yolo/label";
 
 export default function YoloCamera() {
   const [elementWidth, setelementWidth] = useState<number>(0);
@@ -24,7 +25,8 @@ export default function YoloCamera() {
 
   const containerRef = useRef<HTMLDivElement>(null);
   const webcamRef = useRef<Webcam>(null);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const cameraCanvasRef = useRef<HTMLCanvasElement>(null);
+  const boxCanvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
     /**
@@ -61,23 +63,30 @@ export default function YoloCamera() {
     video &&
       session &&
       video.addEventListener("timeupdate", async (event: Event) => {
-        const canvas = canvasRef.current;
-        if (webcamRef.current && canvas) {
-          const ctx = canvas.getContext("2d", { willReadFrequently: true });
+        if (webcamRef.current && cameraCanvasRef.current) {
+          const ctx = cameraCanvasRef.current.getContext("2d", {
+            willReadFrequently: true,
+          });
           ctx && ctx.drawImage(video, 0, 0, elementWidth, elementHeight);
-          ctx && renderBoxes(canvas, resultBoxes);
+
+          boxCanvasRef.current &&
+            renderBoxes(boxCanvasRef.current, resultBoxes);
         }
       });
   }, [webcamRef, session, elementWidth, elementHeight]);
 
   useEffect(() => {
-    const canvas = canvasRef.current;
-    if (canvas === null || session === null) return;
-    detectImage(canvas, session, modelInputShape).then((boxes) => {
-      console.log(`${inferenceCount}: boxes`, boxes);
-      setInferenceCount((prev) => prev + 1);
-      setResultBoxes(boxes);
-    });
+    if (cameraCanvasRef.current === null || session === null) return;
+    detectImage(cameraCanvasRef.current, session, modelInputShape).then(
+      (boxes) => {
+        console.log(
+          `${inferenceCount}: objects`,
+          boxes.map((b) => labels[b.labelIndex])
+        );
+        setInferenceCount((prev) => prev + 1);
+        setResultBoxes(boxes);
+      }
+    );
   }, [resultBoxes]);
 
   const initOrtSession = async () => {
@@ -108,13 +117,17 @@ export default function YoloCamera() {
   }, []);
 
   useEffect(() => {
-    // initial detection
+    /**
+     *  initial detection to trigger inference loop
+     */
     session &&
-      canvasRef.current &&
-      detectImage(canvasRef.current, session, modelInputShape).then((boxes) => {
-        console.log("boxes", boxes);
-        setResultBoxes(boxes);
-      });
+      cameraCanvasRef.current &&
+      detectImage(cameraCanvasRef.current, session, modelInputShape).then(
+        (boxes) => {
+          console.log("boxes", boxes);
+          setResultBoxes(boxes);
+        }
+      );
   }, [session]);
 
   return (
@@ -135,9 +148,16 @@ export default function YoloCamera() {
         }}
       />
       <canvas
-        className="left-0 top-0 absolute"
-        ref={canvasRef}
-        style={{ boxSizing: "content-box" }}
+        className="canvas__camera_input left-0 top-0 absolute"
+        ref={cameraCanvasRef}
+        style={{ boxSizing: "border-box" }}
+        width={elementWidth}
+        height={elementHeight}
+      />
+      <canvas
+        className="canvas__bounding_box left-0 top-0 absolute"
+        ref={boxCanvasRef}
+        style={{ boxSizing: "border-box" }}
         width={elementWidth}
         height={elementHeight}
       />

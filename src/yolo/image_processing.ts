@@ -1,16 +1,22 @@
 "use client";
 
 import * as ort from "onnxruntime-web";
-import { labels } from "./label";
+import { labels } from "@/yolo/label";
 import { InferenceBox, InferenceSessionSet } from "@/utils/types";
 
-export const preprocessing = async (
-  source: HTMLImageElement | HTMLCanvasElement,
+/**
+ *
+ * @param source HTMLCanvasElement instance
+ * @param modelWidth model input width
+ * @param modelHeight model input height
+ * @returns
+ */
+const preprocessing = async (
+  source: HTMLCanvasElement,
   modelWidth: number,
   modelHeight: number
 ): Promise<[any, number, number]> => {
   const cv = window.cv;
-
   const mat = cv.imread(source); // read from img tag
   const matC3 = new cv.Mat(mat.rows, mat.cols, cv.CV_8UC3); // new image matrix
   cv.cvtColor(mat, matC3, cv.COLOR_RGBA2BGR); // RGBA to BGR
@@ -41,8 +47,18 @@ export const preprocessing = async (
   return [input, xRatio, yRatio];
 };
 
+/**
+ *
+ * @param image HTMLCanvasElement instance
+ * @param session onnx-runtime InferenceSession
+ * @param modelInputShape [batch, channel, height, width]
+ * @param topk top-k samples to keep for result
+ * @param iouThreshold IOU (Intersection Over Union) threshold
+ * @param scoreThreshold score (probability) threshold
+ * @returns
+ */
 export const detectImage = async (
-  image: HTMLImageElement | HTMLCanvasElement,
+  image: HTMLCanvasElement,
   session: InferenceSessionSet,
   modelInputShape: [number, number, number, number],
   topk: number = 100,
@@ -107,6 +123,7 @@ export const renderBoxes = (
   }
   ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height); // clean canvas
 
+  // color labels
   const colors = new Map<number, string>();
   labels.forEach((_, idx) => {
     colors.set(idx, "#" + Math.floor(Math.random() * 16777215).toString(16));
