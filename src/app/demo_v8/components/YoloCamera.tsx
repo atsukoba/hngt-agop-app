@@ -7,8 +7,8 @@ import { InferenceBox, InferenceSessionSet } from "@/utils/types";
 import { labels } from "@/yolo/label";
 
 export default function YoloCamera() {
-  const [elementWidth, setelementWidth] = useState<number>(0);
-  const [elementHeight, setelementHeight] = useState<number>(0);
+  const [elementWidth, setElementWidth] = useState<number>(0);
+  const [elementHeight, setElementHeight] = useState<number>(0);
   // cameras
   const [cameras, setCameras] = useState<Array<MediaDeviceInfo>>([]);
   const [camera, setCamera] = useState<MediaDeviceInfo | null>(null);
@@ -32,15 +32,20 @@ export default function YoloCamera() {
     /**
      * @description change camera width and height on resize
      */
-    const handleResize = () => {
-      setelementWidth(containerRef.current?.clientWidth || 0);
-      setelementHeight(containerRef.current?.clientHeight || 0);
-    };
-    containerRef.current?.addEventListener("resize", handleResize);
-    handleResize();
-    return () =>
-      containerRef.current?.removeEventListener("resize", handleResize);
-  }, []);
+    if (containerRef.current === null) return;
+    const observer = new ResizeObserver((entries) => {
+      for (let entry of entries) {
+        const cr = entry.contentRect;
+        setElementWidth(cr.width);
+        setElementHeight(cr.height);
+      }
+    });
+    observer.observe(containerRef.current);
+    // init
+    setElementWidth(containerRef.current.clientWidth);
+    setElementHeight(containerRef.current.clientHeight);
+    return () => observer.disconnect();
+  }, [containerRef.current]);
 
   useEffect(() => {
     /**
@@ -68,12 +73,11 @@ export default function YoloCamera() {
             willReadFrequently: true,
           });
           ctx && ctx.drawImage(video, 0, 0, elementWidth, elementHeight);
-
           boxCanvasRef.current &&
             renderBoxes(boxCanvasRef.current, resultBoxes);
         }
       });
-  }, [webcamRef, session, elementWidth, elementHeight]);
+  }, [webcamRef, session, elementWidth, elementHeight, resultBoxes]);
 
   useEffect(() => {
     if (cameraCanvasRef.current === null || session === null) return;

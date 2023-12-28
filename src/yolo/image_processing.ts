@@ -18,15 +18,15 @@ const preprocessing = async (
 ): Promise<[any, number, number]> => {
   const cv = window.cv;
   const mat = cv.imread(source); // read from img tag
-  const matC3 = new cv.Mat(mat.rows, mat.cols, cv.CV_8UC3); // new image matrix
+  const matC3 = new cv.Mat(mat.rows, mat.cols, cv.CV_8UC3); // new image 3ch matrix [y, x]
   cv.cvtColor(mat, matC3, cv.COLOR_RGBA2BGR); // RGBA to BGR
 
   // padding image to [n x n] dim
   const maxSize = Math.max(matC3.rows, matC3.cols); // get max size from width and height
-  const xPad = maxSize - matC3.cols, // set xPadding
-    xRatio = maxSize / matC3.cols; // set xRatio
-  const yPad = maxSize - matC3.rows, // set yPadding
-    yRatio = maxSize / matC3.rows; // set yRatio
+  const xPad = maxSize - matC3.cols; // set xPadding
+  const xRatio = matC3.cols / modelWidth; // set xRatio
+  const yPad = maxSize - matC3.rows; // set yPadding
+  const yRatio = matC3.rows / modelHeight; // set yRatio
   const matPad = new cv.Mat(); // new mat for padded image
   cv.copyMakeBorder(matC3, matPad, 0, yPad, 0, xPad, cv.BORDER_CONSTANT); // padding black
 
@@ -39,11 +39,15 @@ const preprocessing = async (
     false // crop
   ); // preprocessing image matrix
 
+  // console.log(
+  //   "preprocessing:",
+  //   `mat size ${mat.rows}x${mat.cols}, model size ${modelWidth}x${modelHeight}, maxSize ${maxSize}x${maxSize}, xPad ${xPad}, yPad ${yPad}, xRatio ${xRatio}, yRatio ${yRatio}`
+  // );
+
   // release mat opencv
   mat.delete();
   matC3.delete();
   matPad.delete();
-
   return [input, xRatio, yRatio];
 };
 
@@ -123,31 +127,24 @@ export const renderBoxes = (
   }
   ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height); // clean canvas
 
-  // color labels
-  const colors = new Map<number, string>();
-  labels.forEach((_, idx) => {
-    colors.set(idx, "#" + Math.floor(Math.random() * 16777215).toString(16));
-  });
-
   // font configs
   const font = `${Math.max(
-    Math.round(Math.max(ctx.canvas.width, ctx.canvas.height) / 40),
-    14
+    Math.round(Math.max(ctx.canvas.width, ctx.canvas.height) / 50),
+    12
   )}px Arial`;
   ctx.font = font;
   ctx.textBaseline = "top";
 
   boxes.forEach((box) => {
     const klass = labels[box.labelIndex];
-    const color = colors.get(box.labelIndex) || "#ffffff";
     const score = (box.probability * 100).toFixed(1);
     const [x1, y1, width, height] = box.bounding;
 
     // draw box.
-    ctx.fillStyle = color;
+    ctx.fillStyle = "rgba(0, 0, 0, 0.1)";
     ctx.fillRect(x1, y1, width, height);
     // draw border box
-    ctx.strokeStyle = color;
+    ctx.strokeStyle = "rgba(0, 0, 0, 0.3)";
     ctx.lineWidth = Math.max(
       Math.min(ctx.canvas.width, ctx.canvas.height) / 200,
       2.5
@@ -155,7 +152,7 @@ export const renderBoxes = (
     ctx.strokeRect(x1, y1, width, height);
 
     // draw the label background.
-    ctx.fillStyle = color;
+    ctx.fillStyle = "rgba(255, 255, 255, 0.7)";
     const textWidth = ctx.measureText(klass + " - " + score + "%").width;
     const textHeight = parseInt(font, 10); // base 10
     const yText = y1 - (textHeight + ctx.lineWidth);
@@ -167,7 +164,7 @@ export const renderBoxes = (
     );
 
     // Draw labels
-    ctx.fillStyle = "#ffffff";
+    ctx.fillStyle = "#000000";
     ctx.fillText(
       klass + " - " + score + "%",
       x1 - 1,
