@@ -89,19 +89,20 @@ export default function YoloCamera() {
     if (cameraCanvasRef.current === null || session === null) return;
     detectImage(cameraCanvasRef.current, session, modelInputShape).then(
       (boxes) => {
-        if (boxes.length === 0) return;
         console.log(
           `${inferenceCount}: objects`,
           boxes.map((b) => labels[b.labelIndex])
         );
-        setResultLabelHistory((prev) => {
-          const newHistory = [...prev];
-          newHistory.push(boxes.map((b) => labels[b.labelIndex]));
-          if (newHistory.length > 10) newHistory.shift();
-          return newHistory;
-        });
         setInferenceCount((prev) => prev + 1);
         setResultBoxes(boxes);
+        if (boxes.length !== 0) {
+          setResultLabelHistory((prev) => {
+            const newHistory = [...prev];
+            newHistory.push(boxes.map((b) => labels[b.labelIndex]));
+            if (newHistory.length > 10) newHistory.shift();
+            return newHistory;
+          });
+        }
       }
     );
   }, [resultBoxes]);
