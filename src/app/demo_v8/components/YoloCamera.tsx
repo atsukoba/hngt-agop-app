@@ -34,6 +34,33 @@ export default function YoloCamera() {
   const cameraCanvasRef = useRef<HTMLCanvasElement>(null);
   const boxCanvasRef = useRef<HTMLCanvasElement>(null);
 
+  const initOrtSession = async () => {
+    // wait until opencv.js initialized
+    console.log("OpenCV init:", window.cv);
+    if (window.cv) {
+      // create session
+      console.log("loading models and creating YOLO session");
+      const [yolov8, nms] = await Promise.all([
+        ort.InferenceSession.create(`/models/${modelName}`),
+        ort.InferenceSession.create(`/models/${nmsModelName}`),
+      ]);
+      console.log("checking model input");
+      // warmup main model
+      const tensor = new ort.Tensor(
+        "float32",
+        new Float32Array(modelInputShape.reduce((a, b) => a * b)),
+        modelInputShape
+      );
+      const testRes = await yolov8.run({ images: tensor });
+      console.log("model output :", testRes);
+      setSession({ net: yolov8, nms: nms });
+    }
+  };
+
+  useEffect(() => {
+    initOrtSession();
+  }, []);
+
   useEffect(() => {
     /**
      * @description change camera width and height on resize
@@ -71,22 +98,22 @@ export default function YoloCamera() {
      * @description get data on each update
      */
     const video = webcamRef.current?.video;
-    video &&
-      session &&
-      video.addEventListener("timeupdate", async (event: Event) => {
-        if (webcamRef.current && cameraCanvasRef.current) {
-          const ctx = cameraCanvasRef.current.getContext("2d", {
-            willReadFrequently: true,
-          });
-          ctx && ctx.drawImage(video, 0, 0, elementWidth, elementHeight);
-          boxCanvasRef.current &&
-            renderBoxes(boxCanvasRef.current, resultBoxes);
-        }
-      });
-  }, [webcamRef, session, elementWidth, elementHeight, resultBoxes]);
+    video?.addEventListener("timeupdate", async (event: Event) => {
+      if (webcamRef.current && cameraCanvasRef.current) {
+        const ctx = cameraCanvasRef.current.getContext("2d", {
+          willReadFrequently: true,
+        });
+        ctx && ctx.drawImage(video, 0, 0, elementWidth, elementHeight);
+      }
+    });
+    return video?.removeEventListener("timeupdate", () => {});
+  }, [webcamRef, elementWidth, elementHeight]);
 
   useEffect(() => {
     if (cameraCanvasRef.current === null || session === null) return;
+    // update the bb view
+    boxCanvasRef.current && renderBoxes(boxCanvasRef.current, resultBoxes);
+    // trigger next inference
     detectImage(cameraCanvasRef.current, session, modelInputShape).then(
       (boxes) => {
         console.log(
@@ -106,33 +133,6 @@ export default function YoloCamera() {
       }
     );
   }, [resultBoxes]);
-
-  const initOrtSession = async () => {
-    // wait until opencv.js initialized
-    console.log("OpenCV init:", window.cv);
-    if (window.cv) {
-      // create session
-      console.log("loading models and creating YOLO session");
-      const [yolov8, nms] = await Promise.all([
-        ort.InferenceSession.create(`/models/${modelName}`),
-        ort.InferenceSession.create(`/models/${nmsModelName}`),
-      ]);
-      console.log("checking model input");
-      // warmup main model
-      const tensor = new ort.Tensor(
-        "float32",
-        new Float32Array(modelInputShape.reduce((a, b) => a * b)),
-        modelInputShape
-      );
-      const testRes = await yolov8.run({ images: tensor });
-      console.log("model output :", testRes);
-      setSession({ net: yolov8, nms: nms });
-    }
-  };
-
-  useEffect(() => {
-    initOrtSession();
-  }, []);
 
   useEffect(() => {
     /**
@@ -185,6 +185,7 @@ export default function YoloCamera() {
             key={i}
             className="flex flex-col items-center p-2"
             style={{
+              width: "200px",
               backgroundColor: "rgba(0, 0, 0, 0.3)",
               backdropFilter: "blur(5px)",
               borderRadius: "0.5rem",
@@ -204,6 +205,22 @@ export default function YoloCamera() {
           </div>
         ))}
       </section>
+      {cameras && (
+        <select
+          name=""
+          id=""
+          className="absolute left-4 top-4"
+          onChange={(e) =>
+            setCamera(cameras[e.target.value as unknown as number])
+          }
+        >
+          {cameras.map((c, i) => (
+            <option key={i} value={i}>
+              {c.label}
+            </option>
+          ))}
+        </select>
+      )}
     </div>
   );
 }
