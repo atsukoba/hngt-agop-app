@@ -5,6 +5,14 @@ import Webcam from "react-webcam";
 import * as ort from "onnxruntime-web";
 import { InferenceBox, InferenceSessionSet } from "@/utils/types";
 import { labels } from "@/yolo/label";
+import { useAtom } from "jotai/react";
+import {
+  currentBoxesAtom,
+  currentCameraAtom,
+  currentCamerasAtom,
+  inferenceCountAtom,
+  resultLabelHistoryAtom,
+} from "@/utils/states";
 
 export default function YoloCamera() {
   // element sizes
@@ -12,8 +20,8 @@ export default function YoloCamera() {
   const [elementHeight, setElementHeight] = useState<number>(0);
 
   // cameras
-  const [cameras, setCameras] = useState<Array<MediaDeviceInfo>>([]);
-  const [camera, setCamera] = useState<MediaDeviceInfo | null>(null);
+  const [cameras, setCameras] = useAtom(currentCamerasAtom);
+  const [camera, setCamera] = useAtom(currentCameraAtom);
 
   // model
   const modelName = "yolov8n.onnx";
@@ -21,12 +29,12 @@ export default function YoloCamera() {
   const modelInputShape: [number, number, number, number] = [1, 3, 416, 416];
 
   // inference
-  const [inferenceCount, setInferenceCount] = useState<number>(0);
   const [session, setSession] = useState<InferenceSessionSet | null>(null);
-  const [resultBoxes, setResultBoxes] = useState<InferenceBox[]>([]);
-  const [resultLabelHistory, setResultLabelHistory] = useState<string[][]>([
-    [],
-  ]);
+  const [inferenceCount, setInferenceCount] = useAtom(inferenceCountAtom);
+  const [resultBoxes, setResultBoxes] = useAtom(currentBoxesAtom);
+  const [resultLabelHistory, setResultLabelHistory] = useAtom(
+    resultLabelHistoryAtom
+  );
 
   // refs
   const containerRef = useRef<HTMLDivElement>(null);

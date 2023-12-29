@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "jotai": "^2.6.1",
     "next": "14.0.1",
     "onnxruntime-web": "^1.16.3",
     "react": "^18",
