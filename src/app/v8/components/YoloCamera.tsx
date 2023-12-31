@@ -1,9 +1,9 @@
 "use client";
 import { detectImage, renderBoxes } from "@/yolo/image_processing";
 import { useEffect, useRef, useState } from "react";
-import Webcam from "react-webcam";
+
 import * as ort from "onnxruntime-web";
-import { InferenceBox, InferenceSessionSet } from "@/utils/types";
+import { InferenceSessionSet } from "@/utils/types";
 import { labels } from "@/yolo/label";
 import { useAtom } from "jotai/react";
 import {
@@ -11,10 +11,13 @@ import {
   currentCameraAtom,
   currentCamerasAtom,
   inferenceCountAtom,
+  isCameraOn,
   resultLabelHistoryAtom,
 } from "@/utils/states";
 
 export default function YoloCamera() {
+  // camera on/off
+  const [cameraOn, setCameraOn] = useAtom(isCameraOn);
   // element sizes
   const [elementWidth, setElementWidth] = useState<number>(0);
   const [elementHeight, setElementHeight] = useState<number>(0);
@@ -38,7 +41,7 @@ export default function YoloCamera() {
 
   // refs
   const containerRef = useRef<HTMLDivElement>(null);
-  const webcamRef = useRef<Webcam>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
   const cameraCanvasRef = useRef<HTMLCanvasElement>(null);
   const boxCanvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -62,6 +65,29 @@ export default function YoloCamera() {
       const testRes = await yolov8.run({ images: tensor });
       console.log("model output :", testRes);
       setSession({ net: yolov8, nms: nms });
+    }
+  };
+
+  const handleCameraChange = (m: MediaDeviceInfo) => {
+    setCamera(m);
+    const video = videoRef.current;
+    if (video) {
+      navigator.mediaDevices
+        .getUserMedia({
+          video: {
+            deviceId: m.deviceId,
+            width: {
+              ideal: 1920,
+            },
+            height: {
+              ideal: 1080,
+            },
+          },
+        })
+        .then((stream) => {
+          video.srcObject = stream;
+          video.play();
+        });
     }
   };
 
@@ -96,7 +122,7 @@ export default function YoloCamera() {
       const devices = mediaDevices.filter(({ kind }) => kind === "videoinput");
       setCameras(devices);
       if (devices.length) {
-        setCamera(devices[0]);
+        handleCameraChange(devices[0]);
       }
     });
   }, []);
@@ -105,9 +131,9 @@ export default function YoloCamera() {
     /**
      * @description get data on each update
      */
-    const video = webcamRef.current?.video;
+    const video = videoRef.current;
     video?.addEventListener("timeupdate", async (event: Event) => {
-      if (webcamRef.current && cameraCanvasRef.current) {
+      if (videoRef.current && cameraCanvasRef.current) {
         const ctx = cameraCanvasRef.current.getContext("2d", {
           willReadFrequently: true,
         });
@@ -115,9 +141,12 @@ export default function YoloCamera() {
       }
     });
     return video?.removeEventListener("timeupdate", () => {});
-  }, [webcamRef, elementWidth, elementHeight]);
+  }, [videoRef, camera, elementWidth, elementHeight]);
 
   useEffect(() => {
+    /**
+     * @description inference loop
+     */
     if (cameraCanvasRef.current === null || session === null) return;
     // update the bb view
     boxCanvasRef.current && renderBoxes(boxCanvasRef.current, resultBoxes);
@@ -158,21 +187,7 @@ export default function YoloCamera() {
 
   return (
     <div className="w-full h-full relative" ref={containerRef}>
-      <Webcam
-        ref={webcamRef}
-        videoConstraints={{
-          width: elementWidth,
-          height: elementHeight,
-          facingMode: "user",
-          deviceId: camera?.deviceId,
-        }}
-        className="display-none"
-        style={{
-          width: elementWidth,
-          height: elementHeight,
-          boxSizing: "content-box",
-        }}
-      />
+      <video ref={videoRef}></video>
       <canvas
         className="canvas__camera_input left-0 top-0 absolute"
         ref={cameraCanvasRef}
@@ -187,48 +202,6 @@ export default function YoloCamera() {
         width={elementWidth}
         height={elementHeight}
       />
-      <section className="absolute top-0 right-0 h-screen flex justify-start flex-col p-4 gap-2">
-        {resultLabelHistory.map((labels, i) => (
-          <div
-            key={i}
-            className="flex flex-col items-center p-2"
-            style={{
-              width: "200px",
-              backgroundColor: "rgba(0, 0, 0, 0.3)",
-              backdropFilter: "blur(5px)",
-              borderRadius: "0.5rem",
-            }}
-          >
-            {labels.map((label, j) => (
-              <p
-                key={j}
-                style={{
-                  fontSize: "12px",
-                  color: "#dddddd",
-                }}
-              >
-                [{inferenceCount - 10 + i}] detected: {label}
-              </p>
-            ))}
-          </div>
-        ))}
-      </section>
-      {cameras && (
-        <select
-          name=""
-          id=""
-          className="absolute left-4 top-4"
-          onChange={(e) =>
-            setCamera(cameras[e.target.value as unknown as number])
-          }
-        >
-          {cameras.map((c, i) => (
-            <option key={i} value={i}>
-              {c.label}
-            </option>
-          ))}
-        </select>
-      )}
     </div>
   );
 }
