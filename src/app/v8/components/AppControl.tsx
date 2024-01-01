@@ -4,6 +4,7 @@ import {
   isCameraOn,
 } from "@/utils/states";
 import { useAtom } from "jotai/react";
+import SettingModal from "./SettingModal";
 
 export default function AppControl() {
   const [cameras, setCameras] = useAtom(currentCamerasAtom);
@@ -13,8 +14,7 @@ export default function AppControl() {
   return (
     <div className="absolute left-4 top-4">
       <select
-        name=""
-        id=""
+        className="select select-accent w-full max-w-xs"
         onChange={(e) =>
           setCamera(cameras[e.target.value as unknown as number])
         }
@@ -35,6 +35,7 @@ export default function AppControl() {
           />
         </label>
       </div>
+      <SettingModal className="btn-outline" />
     </div>
   );
 }
