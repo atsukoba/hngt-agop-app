@@ -1,52 +1,42 @@
 import { inferenceCountAtom, resultLabelHistoryAtom } from "@/utils/states";
 import { useAtom } from "jotai/react";
+import { useEffect, useRef } from "react";
 
 export default function AppInfo({ width = 200 }: { width: number }) {
   const [inferenceCount, setInferenceCount] = useAtom(inferenceCountAtom);
   const [resultLabelHistory, setResultLabelHistory] = useAtom(
     resultLabelHistoryAtom
   );
+  // history results
+  const anchorRef = useRef<HTMLDivElement>(null);
+  // useEffect(() => {
+  //   if (resultLabelHistory.length) {
+  //     anchorRef.current?.scrollIntoView({
+  //       behavior: "smooth",
+  //       block: "end",
+  //     });
+  //   }
+  // }, [resultLabelHistory]);
+
   return (
     <section
-      className={`absolute top-0 right-0 w-px[${width}] h-screen overflow-y-scroll flex flex-col items-center p-4 gap-2`}
+      className={`absolute top-0 right-0 w-px[${width}] h-screen overflow-y-auto flex flex-col items-center p-4 gap-2`}
     >
       {resultLabelHistory.map((labels, i) => (
         <div
+          className="card-compact w-full bg-base-100 bg-opacity-30 shadow-md rounded-md"
           key={i}
-          className="card w-full bg-base-200 bg-opacity-30 shadow-md"
         >
-          <div className="card-body">
-            <div className="card-actions justify-end"></div>
+          <div className="card-body animate-in fade-in-5 animate-out fade-out-5">
             {labels.map((label, j) => (
               <p key={j} className="text-xs text-teal-50">
-                [{inferenceCount - 10 + i}] detected: {label}
+                {label}
               </p>
             ))}
           </div>
         </div>
-        // <div
-        //   key={i}
-        //   className="flex flex-col items-center p-2"
-        //   style={{
-        //     width: "200px",
-        //     backgroundColor: "rgba(0, 0, 0, 0.3)",
-        //     backdropFilter: "blur(5px)",
-        //     borderRadius: "0.5rem",
-        //   }}
-        // >
-        //   {labels.map((label, j) => (
-        //     <p
-        //       key={j}
-        //       style={{
-        //         fontSize: "12px",
-        //         color: "#dddddd",
-        //       }}
-        //     >
-        //       [{inferenceCount - 10 + i}] detected: {label}
-        //     </p>
-        //   ))}
-        // </div>
       ))}
+      <div ref={anchorRef}></div>
     </section>
   );
 }

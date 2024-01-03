@@ -163,7 +163,7 @@ export default function YoloCamera() {
           setResultLabelHistory((prev) => {
             const newHistory = [...prev];
             newHistory.push(boxes.map((b) => labels[b.labelIndex]));
-            if (newHistory.length > 10) newHistory.shift();
+            if (newHistory.length > 5) newHistory.shift();
             return newHistory;
           });
         }

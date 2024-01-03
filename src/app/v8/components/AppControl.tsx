@@ -12,7 +12,7 @@ export default function AppControl() {
   const [cameraOn, setCameraOn] = useAtom(isCameraOn);
 
   return (
-    <div className="absolute left-4 top-4">
+    <div className="absolute left-4 bottom-4">
       <select
         className="select select-accent w-full max-w-xs"
         onChange={(e) =>
