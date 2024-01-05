@@ -1,14 +1,18 @@
+"use client";
+
 import { inferenceCountAtom, resultLabelHistoryAtom } from "@/utils/states";
+import { labelsIconMap } from "@/yolo/label";
 import { useAtom } from "jotai/react";
 import { useEffect, useRef } from "react";
 
-export default function AppInfo({ width = 200 }: { width: number }) {
+export default function DetectStatus({ width = 200 }: { width: number }) {
   const [inferenceCount, setInferenceCount] = useAtom(inferenceCountAtom);
   const [resultLabelHistory, setResultLabelHistory] = useAtom(
     resultLabelHistoryAtom
   );
   // history results
   const anchorRef = useRef<HTMLDivElement>(null);
+
   // useEffect(() => {
   //   if (resultLabelHistory.length) {
   //     anchorRef.current?.scrollIntoView({
@@ -30,6 +34,7 @@ export default function AppInfo({ width = 200 }: { width: number }) {
           <div className="card-body animate-in fade-in-5 animate-out fade-out-5">
             {labels.map((label, j) => (
               <p key={j} className="text-xs text-teal-50">
+                {labelsIconMap[label]}
                 {label}
               </p>
             ))}
