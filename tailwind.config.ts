@@ -1,5 +1,7 @@
 import type { Config } from "tailwindcss";
 
+const { addDynamicIconSelectors } = require("@iconify/tailwind");
+
 const config: Config = {
   content: [
     "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
@@ -14,7 +16,11 @@ const config: Config = {
       },
     },
   },
-  plugins: [require("daisyui"), require("tailwindcss-animate")],
+  plugins: [
+    require("daisyui"),
+    require("tailwindcss-animate"),
+    addDynamicIconSelectors(),
+  ],
   daisyui: {
     themes: ["dark", "synthwave", "forest"],
   },
