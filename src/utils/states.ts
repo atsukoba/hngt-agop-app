@@ -1,6 +1,6 @@
 import { atom } from "jotai";
 import { InferenceBox } from "./types";
-import { Label } from "@/yolo/label";
+import { Label, defaultLabelsJaLabelMap } from "@/yolo/label";
 import { LoadingMessages } from "./consts";
 
 // app state
@@ -15,6 +15,9 @@ export const scoreThreshold = atom<number>(0.2);
 // detection result
 export const resultLabelHistoryAtom = atom<Label[][]>([]);
 export const currentBoxesAtom = atom<InferenceBox[]>([]);
+export const labelsJaLabelMapAtom = atom<{ [key in Label]: string }>(
+  defaultLabelsJaLabelMap
+);
 
 // camera
 export const isCameraOn = atom<boolean>(false);

@@ -1,15 +1,18 @@
 "use client";
 
-import { inferenceCountAtom, resultLabelHistoryAtom } from "@/utils/states";
+import {
+  inferenceCountAtom,
+  labelsJaLabelMapAtom,
+  resultLabelHistoryAtom,
+} from "@/utils/states";
 import { labelsIconMap } from "@/yolo/label";
-import { useAtom } from "jotai/react";
+import { useAtom, useAtomValue } from "jotai/react";
 import { useEffect, useRef } from "react";
 
 export default function DetectStatus({ width = 200 }: { width: number }) {
-  const [inferenceCount, setInferenceCount] = useAtom(inferenceCountAtom);
-  const [resultLabelHistory, setResultLabelHistory] = useAtom(
-    resultLabelHistoryAtom
-  );
+  const resultLabelHistory = useAtomValue(resultLabelHistoryAtom);
+  const jaLabel = useAtomValue(labelsJaLabelMapAtom);
+
   // history results
   const anchorRef = useRef<HTMLDivElement>(null);
 
@@ -24,19 +27,28 @@ export default function DetectStatus({ width = 200 }: { width: number }) {
 
   return (
     <section
-      className={`absolute top-0 right-0 w-px[${width}] h-screen overflow-y-auto flex flex-col items-center p-4 gap-2`}
+      className={`absolute top-0 right-0 h-screen overflow-y-auto flex flex-col items-center p-4 gap-2`}
+      style={{
+        width: `${width}px`,
+      }}
     >
       {resultLabelHistory.map((labels, i) => (
         <div
           className="card-compact w-full bg-base-100 bg-opacity-30 shadow-md rounded-md"
-          key={i}
+          key={`detected_labels_${i}`}
         >
-          <div className="card-body animate-in fade-in-5 animate-out fade-out-5">
+          <div className="card-body animate-in fade-in-5">
             {labels.map((label, j) => (
-              <p key={j} className="text-xs text-teal-50">
-                {labelsIconMap[label]}
-                {label}
-              </p>
+              <div
+                key={`detected_label_${label}_${j}`}
+                className="flex flex-col gap-1 align-text-bottom"
+              >
+                <div className="badge badge-outline gap-2">
+                  {/* {labelsIconMap[label]} */}
+                  <p className="text-xs font-mono">{label}</p>
+                </div>
+                <span className="text-xs font-sans">→{jaLabel[label]}</span>
+              </div>
             ))}
           </div>
         </div>

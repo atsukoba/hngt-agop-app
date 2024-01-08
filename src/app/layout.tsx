@@ -15,7 +15,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="ja">
+    <html lang="ja" data-theme="forest">
       <head>
         <meta charSet="utf-8" />
         <meta name="title" content={metadata.title as string} />

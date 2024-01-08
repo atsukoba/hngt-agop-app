@@ -22,7 +22,7 @@ const config: Config = {
     addDynamicIconSelectors(),
   ],
   daisyui: {
-    themes: ["dark", "synthwave", "forest"],
+    themes: ["synthwave", "dark", "forest"],
   },
 };
 export default config;
