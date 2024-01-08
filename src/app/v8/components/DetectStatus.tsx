@@ -29,7 +29,7 @@ export default function DetectStatus({ width = 200 }: { width: number }) {
     >
       {resultLabelHistory.map((labels, i) => (
         <div
-          className="card-compact w-full bg-base-100 bg-opacity-30 shadow-md rounded-md"
+          className="card-compact w-full bg-base-100 bg-opacity-50 shadow-md rounded-md"
           key={`detected_labels_${i}`}
         >
           <div className="card-body animate-in fade-in-5">
