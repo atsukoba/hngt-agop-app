@@ -77,6 +77,9 @@ export default function YoloCamera() {
   };
 
   const handleCameraChange = (m: MediaDeviceInfo) => {
+    /**
+     * @description init camera setings
+     */
     setCamera(m);
     const video = videoRef.current;
     if (video) {
@@ -141,55 +144,56 @@ export default function YoloCamera() {
      * @description get data on each update
      */
     const video = videoRef.current;
+    if (!videoRef.current || !cameraCanvasRef.current) {
+      return;
+    }
+    const ctx = cameraCanvasRef.current.getContext("2d", {
+      willReadFrequently: true,
+    });
     video?.addEventListener("timeupdate", async (event: Event) => {
-      if (videoRef.current && cameraCanvasRef.current) {
-        const ctx = cameraCanvasRef.current.getContext("2d", {
-          willReadFrequently: true,
-        });
-        ctx && ctx.drawImage(video, 0, 0, elementWidth, elementHeight);
-      }
+      ctx?.drawImage(video, 0, 0, elementWidth, elementHeight);
     });
     return video?.removeEventListener("timeupdate", () => {});
   }, [videoRef, camera, elementWidth, elementHeight]);
 
-  // useEffect(() => {
-  //   /**
-  //    * @description inference loop
-  //    */
-  //   if (cameraCanvasRef.current === null || session === null) return;
-  //   // update the bb view
-  //   boxCanvasRef.current && renderBoxes(boxCanvasRef.current, resultBoxes);
-  //   // trigger next inference
-  //   detectImage(
-  //     cameraCanvasRef.current,
-  //     session,
-  //     modelInputShape,
-  //     topKVal,
-  //     iouThresholdVal,
-  //     scoreThresholdVal
-  //   ).then((boxes) => {
-  //     console.log(
-  //       `${inferenceCount}: objects`,
-  //       boxes.map((b) => labels[b.labelIndex]),
-  //       "params",
-  //       {
-  //         topKVal,
-  //         iouThresholdVal,
-  //         scoreThresholdVal,
-  //       }
-  //     );
-  //     setInferenceCount((prev) => prev + 1);
-  //     setResultBoxes(boxes);
-  //     if (boxes.length !== 0) {
-  //       setResultLabelHistory((prev) => {
-  //         const newHistory = [...prev];
-  //         newHistory.push(boxes.map((b) => labels[b.labelIndex]));
-  //         if (newHistory.length > 5) newHistory.shift();
-  //         return newHistory;
-  //       });
-  //     }
-  //   });
-  // }, [resultBoxes]);
+  useEffect(() => {
+    /**
+     * @description inference loop
+     */
+    if (cameraCanvasRef.current === null || session === null) return;
+    // update the bb view
+    boxCanvasRef.current && renderBoxes(boxCanvasRef.current, resultBoxes);
+    // trigger next inference
+    detectImage(
+      cameraCanvasRef.current,
+      session,
+      modelInputShape,
+      topKVal,
+      iouThresholdVal,
+      scoreThresholdVal
+    ).then((boxes) => {
+      console.log(
+        `${inferenceCount}: objects`,
+        boxes.map((b) => labels[b.labelIndex]),
+        "params",
+        {
+          topKVal,
+          iouThresholdVal,
+          scoreThresholdVal,
+        }
+      );
+      setInferenceCount((prev) => prev + 1);
+      setResultBoxes(boxes);
+      if (boxes.length !== 0) {
+        setResultLabelHistory((prev) => {
+          const newHistory = [...prev];
+          newHistory.push(boxes.map((b) => labels[b.labelIndex]));
+          if (newHistory.length > 5) newHistory.shift();
+          return newHistory;
+        });
+      }
+    });
+  }, [resultBoxes]);
 
   useEffect(() => {
     /**
@@ -209,11 +213,14 @@ export default function YoloCamera() {
 
   return (
     <div className="w-full h-full relative" ref={containerRef}>
-      <video ref={videoRef}></video>
+      <video
+        className="w-full h-full left-0 top-0 absolute"
+        ref={videoRef}
+      ></video>
       <canvas
-        className="canvas__camera_input left-0 top-0 absolute"
+        className="canvas__camera_input"
         ref={cameraCanvasRef}
-        style={{ boxSizing: "border-box" }}
+        style={{ boxSizing: "border-box", display: "none!important" }}
         width={elementWidth}
         height={elementHeight}
       />
