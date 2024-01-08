@@ -1,14 +1,20 @@
 import YoloCamera from "./components/YoloCamera";
-import AppControl from "./components/AppControl";
+import AppFooter from "./components/AppFooter";
 import DetectStatus from "./components/DetectStatus";
 import Loading from "./components/Loading";
+import LMDisplay from "./components/LMDisplay";
 
 export default function App() {
   return (
     <main className="flex w-screen h-screen flex-col items-center justify-between relative">
+      {/* 
+        all the child components are positioned absolute.
+        each component has its own comtainer with full width and height.
+      */}
       <YoloCamera />
-      <AppControl />
       <DetectStatus width={200} />
+      <LMDisplay className="w-screen h-screen absolute left-0 top-0" />
+      <AppFooter />
       <Loading />
     </main>
   );

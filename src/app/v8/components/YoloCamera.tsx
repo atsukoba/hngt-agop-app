@@ -14,11 +14,13 @@ import {
   iouThreshold,
   isCameraOn,
   loadingMessageAtom,
+  promptDialogMessageAtom,
   resultLabelHistoryAtom,
   scoreThreshold,
   topK,
 } from "@/utils/states";
 import { LoadingMessages } from "@/utils/consts";
+import { buildPrompts } from "@/prompts/builder";
 
 export default function YoloCamera() {
   // element sizes
@@ -52,6 +54,11 @@ export default function YoloCamera() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const cameraCanvasRef = useRef<HTMLCanvasElement>(null);
   const boxCanvasRef = useRef<HTMLCanvasElement>(null);
+
+  // prompts
+  const [promptDialogMessage, setPromptDialogMessage] = useAtom(
+    promptDialogMessageAtom
+  );
 
   // loading
   const [loadingMessage, setLoadingMessage] = useAtom(loadingMessageAtom);
@@ -190,6 +197,10 @@ export default function YoloCamera() {
           if (newHistory.length > 5) newHistory.shift();
           return newHistory;
         });
+        if (setResultLabelHistory.length % 10 === 0) {
+          const prompt = buildPrompts(resultLabelHistory);
+          setPromptDialogMessage(prompt);
+        }
       }
     });
   }, [resultBoxes, cameraOn]);
@@ -219,7 +230,7 @@ export default function YoloCamera() {
       <canvas
         className="canvas__camera_input"
         ref={cameraCanvasRef}
-        style={{ boxSizing: "border-box", display: "none!important" }}
+        style={{ boxSizing: "border-box", display: "none" }}
         width={elementWidth}
         height={elementHeight}
       />

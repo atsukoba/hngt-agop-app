@@ -23,3 +23,7 @@ export const labelsJaLabelMapAtom = atom<{ [key in Label]: string }>(
 export const isCameraOn = atom<boolean>(false);
 export const currentCameraAtom = atom<MediaDeviceInfo | null>(null);
 export const currentCamerasAtom = atom<MediaDeviceInfo[]>([]);
+
+// prompt dialog state
+export const isPromptDialogOpenAtom = atom<boolean>(false);
+export const promptDialogMessageAtom = atom<string>("");
