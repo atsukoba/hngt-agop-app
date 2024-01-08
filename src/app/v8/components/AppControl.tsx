@@ -6,7 +6,6 @@ import {
   isCameraOn,
 } from "@/utils/states";
 import { useAtom } from "jotai/react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 export default function AppControl() {
@@ -18,16 +17,6 @@ export default function AppControl() {
 
   return (
     <div className="absolute left-4 bottom-4 flex flex-row justify-start gap-4">
-      {/* <div className="form-control w-52">
-        <label className="cursor-pointer label">
-          <span className="label-text">Camera ON/OFF</span>
-          <input
-            type="checkbox"
-            className="toggle toggle-primary"
-            onChange={(e) => setCameraOn(e.target.checked)}
-          />
-        </label>
-      </div> */}
       <div className="w-24">
         <button
           onClick={(_) => {

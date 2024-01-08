@@ -122,13 +122,14 @@ export default function YoloCamera() {
     // init
     setElementWidth(containerRef.current.clientWidth);
     setElementHeight(containerRef.current.clientHeight);
-    // return () => observer.disconnect();
+    return () => observer.disconnect();
   }, [containerRef.current]);
 
   useEffect(() => {
     /**
      * @description set camera on mount
      */
+    setCameraOn(true);
     setLoadingMessage(LoadingMessages.SETUP_CAMERA);
     navigator.mediaDevices.enumerateDevices().then((mediaDevices) => {
       const devices = mediaDevices.filter(({ kind }) => kind === "videoinput");
@@ -160,7 +161,13 @@ export default function YoloCamera() {
     /**
      * @description inference loop
      */
-    if (cameraCanvasRef.current === null || session === null) return;
+    if (cameraCanvasRef.current === null || session === null || !cameraOn) {
+      const ctx = boxCanvasRef.current?.getContext("2d", {
+        willReadFrequently: true,
+      });
+      ctx?.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height); // clean canvas
+      return;
+    }
     // update the bb view
     boxCanvasRef.current && renderBoxes(boxCanvasRef.current, resultBoxes);
     // trigger next inference
@@ -193,7 +200,7 @@ export default function YoloCamera() {
         });
       }
     });
-  }, [resultBoxes]);
+  }, [resultBoxes, cameraOn]);
 
   useEffect(() => {
     /**

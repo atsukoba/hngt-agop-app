@@ -1,6 +1,5 @@
 "use client";
 
-import { LoadingMessages } from "@/utils/consts";
 import { loadingMessageAtom } from "@/utils/states";
 import { useAtomValue } from "jotai/react";
 

@@ -2,6 +2,7 @@
 
 import {
   iouThreshold,
+  isCameraOn,
   labelsJaLabelMapAtom,
   scoreThreshold,
   topK,
@@ -9,9 +10,10 @@ import {
 import { labels, labelsIconMap } from "@/yolo/label";
 import { useAtom } from "jotai/react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 const InfoIcon = (tooltipMsg: string) => (
-  <div className="tooltip" data-tip={tooltipMsg}>
+  <div className="tooltip tooltip-right" data-tip={tooltipMsg}>
     <span
       className="icon-[mdi--information-slab-circle-outline] w-5 h-5 mr-2"
       style={{ verticalAlign: "-0.3em" }}
@@ -20,6 +22,9 @@ const InfoIcon = (tooltipMsg: string) => (
 );
 
 export default function SettingModal() {
+  const router = useRouter();
+
+  const [cameraOn, setCameraOn] = useAtom(isCameraOn);
   const [labelsJaLabelMap, setLabelsJaLabelMap] = useAtom(labelsJaLabelMapAtom);
   const [topKVal, settopK] = useAtom(topK);
   const [iouThresholdVal, setiouThreshold] = useAtom(iouThreshold);
@@ -29,11 +34,21 @@ export default function SettingModal() {
     <div className="container  mx-auto px-4 py-8">
       <div className="w-full flex justify-between flex-row">
         <h1 className="font-bold text-4xl mb-8">SETTINGS</h1>
-        <button className="btn btn-primary btn-md">
-          <Link href="/v8/">Back to App</Link>
+        <button
+          className="btn btn-primary btn-md"
+          onClick={(e) => {
+            setCameraOn(true);
+            router.push("/v8/");
+          }}
+        >
+          Back to App
         </button>
       </div>
       <h2 className="font-bold text-lg mb-8">YOLO v8</h2>
+
+      <p className="mb-8">
+        currently used model is YOLO v8n (/models/yolov8n.onnx).
+      </p>
 
       <div className="mb-8">
         <h3 className="font-bold text-md mb-8">

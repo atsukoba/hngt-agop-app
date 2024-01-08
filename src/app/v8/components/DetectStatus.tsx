@@ -1,13 +1,8 @@
 "use client";
 
-import {
-  inferenceCountAtom,
-  labelsJaLabelMapAtom,
-  resultLabelHistoryAtom,
-} from "@/utils/states";
-import { labelsIconMap } from "@/yolo/label";
-import { useAtom, useAtomValue } from "jotai/react";
-import { useEffect, useRef } from "react";
+import { labelsJaLabelMapAtom, resultLabelHistoryAtom } from "@/utils/states";
+import { useAtomValue } from "jotai/react";
+import { useRef } from "react";
 
 export default function DetectStatus({ width = 200 }: { width: number }) {
   const resultLabelHistory = useAtomValue(resultLabelHistoryAtom);
