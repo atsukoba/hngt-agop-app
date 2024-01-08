@@ -142,25 +142,10 @@ export default function YoloCamera() {
 
   useEffect(() => {
     /**
-     * @description get data on each update
-     */
-    const video = videoRef.current;
-    if (!videoRef.current || !cameraCanvasRef.current) {
-      return;
-    }
-    const ctx = cameraCanvasRef.current.getContext("2d", {
-      willReadFrequently: true,
-    });
-    video?.addEventListener("timeupdate", async (event: Event) => {
-      ctx?.drawImage(video, 0, 0, elementWidth, elementHeight);
-    });
-    return video?.removeEventListener("timeupdate", () => {});
-  }, [videoRef, camera, elementWidth, elementHeight]);
-
-  useEffect(() => {
-    /**
      * @description inference loop
      */
+
+    // check if all refs are ready
     if (cameraCanvasRef.current === null || session === null || !cameraOn) {
       const ctx = boxCanvasRef.current?.getContext("2d", {
         willReadFrequently: true,
@@ -168,6 +153,13 @@ export default function YoloCamera() {
       ctx?.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height); // clean canvas
       return;
     }
+    // get data on each update
+    videoRef.current &&
+      cameraCanvasRef.current
+        .getContext("2d", {
+          willReadFrequently: true,
+        })
+        ?.drawImage(videoRef.current, 0, 0, elementWidth, elementHeight);
     // update the bb view
     boxCanvasRef.current && renderBoxes(boxCanvasRef.current, resultBoxes);
     // trigger next inference
