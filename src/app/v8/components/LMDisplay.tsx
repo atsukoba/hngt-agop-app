@@ -2,10 +2,7 @@
 
 import { DetailedHTMLProps, HTMLAttributes } from "react";
 
-import {
-  promptDialogMessageAtom,
-  resultLabelHistoryAtom,
-} from "@/utils/states";
+import { promptDialogMessageAtom } from "@/utils/states";
 import { useAtomValue } from "jotai/react";
 
 export default function LMDisplay({

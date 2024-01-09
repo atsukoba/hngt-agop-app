@@ -13,8 +13,8 @@ export const iouThreshold = atom<number>(0.35);
 export const scoreThreshold = atom<number>(0.2);
 
 // detection result
-export const resultLabelHistoryAtom = atom<Label[][]>([]);
-export const currentBoxesAtom = atom<InferenceBox[]>([]);
+export const resultBoxesHistoryAtom = atom<InferenceBox[][]>([[]]);
+export const currentBoxesAtom = atom<InferenceBox[]>([]); // for display on canvas
 export const labelsJaLabelMapAtom = atom<{ [key in Label]: string }>(
   defaultLabelsJaLabelMap
 );

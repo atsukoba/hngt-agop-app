@@ -15,12 +15,12 @@ import {
   isCameraOn,
   loadingMessageAtom,
   promptDialogMessageAtom,
-  resultLabelHistoryAtom,
+  resultBoxesHistoryAtom,
   scoreThreshold,
   topK,
 } from "@/utils/states";
 import { LoadingMessages } from "@/utils/consts";
-import { buildPrompts } from "@/prompts/builder";
+import { isSameInferenceBoxes } from "@/utils/data";
 
 export default function YoloCamera() {
   // element sizes
@@ -42,8 +42,8 @@ export default function YoloCamera() {
   const [session, setSession] = useState<InferenceSessionSet | null>(null);
   const [inferenceCount, setInferenceCount] = useAtom(inferenceCountAtom);
   const [resultBoxes, setResultBoxes] = useAtom(currentBoxesAtom);
-  const [resultLabelHistory, setResultLabelHistory] = useAtom(
-    resultLabelHistoryAtom
+  const [resultBoxesHistory, setResultBoxesHistory] = useAtom(
+    resultBoxesHistoryAtom
   );
   const topKVal = useAtomValue(topK);
   const iouThresholdVal = useAtomValue(iouThreshold);
@@ -190,24 +190,25 @@ export default function YoloCamera() {
       );
       setInferenceCount((prev) => prev + 1);
       setResultBoxes(boxes);
-      if (boxes.length !== 0) {
-        setResultLabelHistory((prev) => {
-          const newHistory = [...prev];
-          newHistory.push(boxes.map((b) => labels[b.labelIndex]));
-          if (newHistory.length > 5) newHistory.shift();
+      if (
+        boxes.length !== 0 &&
+        !isSameInferenceBoxes(
+          boxes,
+          resultBoxesHistory[resultBoxesHistory.length - 1]
+        )
+      ) {
+        setResultBoxesHistory((prev) => {
+          const newHistory = [...prev, boxes];
+          if (newHistory.length > 10) newHistory.shift();
           return newHistory;
         });
-        if (setResultLabelHistory.length % 10 === 0) {
-          const prompt = buildPrompts(resultLabelHistory);
-          setPromptDialogMessage(prompt);
-        }
       }
     });
   }, [resultBoxes, cameraOn]);
 
   useEffect(() => {
     /**
-     *  initial detection to trigger inference loop
+     *  @description initial detection to trigger inference loop
      */
     if (session && cameraCanvasRef.current) {
       setLoadingMessage(LoadingMessages.TEST_MODEL);

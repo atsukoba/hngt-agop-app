@@ -1,11 +1,16 @@
-import { Label } from "@/yolo/label";
-import { LLMContentType, PositionDesc, prosthesis } from "./templates";
+import {
+  LLMContentType,
+  PositionDesc,
+  getRandomLLMContentType,
+  getRandomThemePrompt,
+} from "./templates";
 
-export const buildPrompts = (results: Label[][]) => {
+export const buildRandomPrompts = (inputLabels: string[]) => {
   // randomly select 2 objects from results
-  const [a, b] = results
-    .sort(() => Math.random() - 0.5)
-    .slice(0, 2)
-    .map((labels) => labels[0]);
-  return prosthesis(a, b, PositionDesc.beside, LLMContentType.scientific);
+  return getRandomThemePrompt(
+    inputLabels[0],
+    inputLabels[1],
+    PositionDesc.beside,
+    getRandomLLMContentType()
+  );
 };
