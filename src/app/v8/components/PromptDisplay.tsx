@@ -2,11 +2,17 @@
 
 import { DetailedHTMLProps, HTMLAttributes, useEffect, useState } from "react";
 
-import { promptDialogMessageAtom } from "@/utils/states";
+import {
+  apiKeyAtom,
+  modelNameAtom,
+  promptDialogMessageAtom,
+} from "@/utils/states";
 import { useAtomValue } from "jotai/react";
+import { fetchGenerate } from "@/utils/api";
 
 const PromptWrap = ({ prompt }: { prompt: string }) => {
   const [currentPrompt, setCurrentPrompt] = useState("");
+
   useEffect(() => {
     let cnt = 0;
     const runner = setInterval(() => {
@@ -14,7 +20,7 @@ const PromptWrap = ({ prompt }: { prompt: string }) => {
       setCurrentPrompt(current);
       current === prompt && clearInterval(runner);
       cnt++;
-    }, 50);
+    }, 30);
   }, [prompt]);
   return (
     <p className="w-full text-right align-middle text-lg font-serif">
@@ -27,6 +33,14 @@ export default function PromptDisplay({
   ...props
 }: DetailedHTMLProps<HTMLAttributes<HTMLDivElement>, HTMLDivElement>) {
   const promptDialogMessage = useAtomValue(promptDialogMessageAtom);
+  const token = useAtomValue(apiKeyAtom);
+  const modelName = useAtomValue(modelNameAtom);
+
+  useEffect(() => {
+    if (promptDialogMessage) {
+      fetchGenerate(promptDialogMessage, token, modelName);
+    }
+  }, [promptDialogMessage]);
 
   return (
     <section {...props}>
