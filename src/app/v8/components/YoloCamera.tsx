@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import * as ort from "onnxruntime-web";
 import { InferenceSessionSet } from "@/utils/types";
 import { labels } from "@/yolo/label";
-import { useAtom, useAtomValue } from "jotai/react";
+import { useAtom, useAtomValue, useSetAtom } from "jotai/react";
 import {
   currentBoxesAtom,
   currentCameraAtom,
@@ -30,8 +30,8 @@ export default function YoloCamera() {
   // camera on/off
   const [cameraOn, setCameraOn] = useAtom(isCameraOn);
   // cameras
-  const [cameras, setCameras] = useAtom(currentCamerasAtom);
-  const [camera, setCamera] = useAtom(currentCameraAtom);
+  const setCameras = useSetAtom(currentCamerasAtom);
+  const setCamera = useSetAtom(currentCameraAtom);
 
   // model
   const modelName = "yolov8n.onnx";
@@ -178,16 +178,16 @@ export default function YoloCamera() {
       iouThresholdVal,
       scoreThresholdVal
     ).then((boxes) => {
-      console.log(
-        `${inferenceCount}: objects`,
-        boxes.map((b) => labels[b.labelIndex]),
-        "params",
-        {
-          topKVal,
-          iouThresholdVal,
-          scoreThresholdVal,
-        }
-      );
+      // console.log(
+      //   `${inferenceCount}: objects`,
+      //   boxes.map((b) => labels[b.labelIndex]),
+      //   "params",
+      //   {
+      //     topKVal,
+      //     iouThresholdVal,
+      //     scoreThresholdVal,
+      //   }
+      // );
       setInferenceCount((prev) => prev + 1);
       setResultBoxes(boxes);
       if (
@@ -214,7 +214,7 @@ export default function YoloCamera() {
       setLoadingMessage(LoadingMessages.TEST_MODEL);
       detectImage(cameraCanvasRef.current, session, modelInputShape).then(
         (boxes) => {
-          console.log("boxes", boxes);
+          // console.log("boxes", boxes);
           setResultBoxes(boxes);
           setLoadingMessage(undefined);
         }

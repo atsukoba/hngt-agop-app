@@ -1,8 +1,9 @@
-import { atom } from "jotai";
-import { InferenceBox } from "./types";
 import { Label, defaultLabelsJaLabelMap } from "@/yolo/label";
-import { LoadingMessages } from "./consts";
+import { atom } from "jotai";
 import { atomWithStorage } from "jotai/utils";
+import { v4 as uuidv4 } from "uuid";
+import { LoadingMessages } from "./consts";
+import { InferenceBox } from "./types";
 
 // app state
 export const loadingMessageAtom = atom<LoadingMessages | undefined>(undefined);
@@ -28,12 +29,13 @@ export const isCameraOn = atom<boolean>(false);
 export const currentCameraAtom = atom<MediaDeviceInfo | null>(null);
 export const currentCamerasAtom = atom<MediaDeviceInfo[]>([]);
 
-// prompt dialog state
+// dialog state
 export const isPromptDialogOpenAtom = atom<boolean>(false);
 export const promptDialogMessageAtom = atom<string>("");
 export const llmResponseAtom = atom<string>("");
 
 // OpenAI API
+export const chatIdAtom = atomWithStorage<string>("agop_chatIdAtom", uuidv4());
 export const apiKeyAtom = atomWithStorage<string>("agop_apiKeyAtom", "");
 export const modelNameAtom = atomWithStorage<string>(
   "agop_modelNameAtom",

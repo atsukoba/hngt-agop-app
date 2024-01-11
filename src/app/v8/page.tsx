@@ -12,7 +12,7 @@ export default function App() {
         each component has its own comtainer with full width and height.
       */}
       <YoloCamera />
-      <LMDisplay className="w-screen h-screen absolute left-0 top-0" />
+      <LMDisplay />
       <DetectStatus width={200} />
       <AppFooter />
       <Loading />

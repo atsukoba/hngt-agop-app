@@ -1,14 +1,14 @@
 "use client";
 
-import { DetailedHTMLProps, HTMLAttributes, useEffect, useState } from "react";
-
+import { updateLlmResponse } from "@/utils/api";
 import {
   apiKeyAtom,
+  llmResponseAtom,
   modelNameAtom,
   promptDialogMessageAtom,
 } from "@/utils/states";
-import { useAtomValue } from "jotai/react";
-import { fetchGenerate } from "@/utils/api";
+import { useAtomValue, useSetAtom } from "jotai/react";
+import { DetailedHTMLProps, HTMLAttributes, useEffect, useState } from "react";
 
 const PromptWrap = ({ prompt }: { prompt: string }) => {
   const [currentPrompt, setCurrentPrompt] = useState("");
@@ -35,10 +35,11 @@ export default function PromptDisplay({
   const promptDialogMessage = useAtomValue(promptDialogMessageAtom);
   const token = useAtomValue(apiKeyAtom);
   const modelName = useAtomValue(modelNameAtom);
+  const setLlmsResponse = useSetAtom(llmResponseAtom);
 
   useEffect(() => {
     if (promptDialogMessage) {
-      fetchGenerate(promptDialogMessage, token, modelName);
+      updateLlmResponse(promptDialogMessage, token, setLlmsResponse, modelName);
     }
   }, [promptDialogMessage]);
 

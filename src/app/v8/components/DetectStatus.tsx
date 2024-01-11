@@ -8,15 +8,13 @@ import {
 } from "@/utils/states";
 import { InferenceBox } from "@/utils/types";
 import { labels } from "@/yolo/label";
-import { useAtom, useAtomValue } from "jotai/react";
+import { useAtomValue, useSetAtom } from "jotai/react";
 import { useEffect, useRef } from "react";
 
 export default function DetectStatus({ width = 200 }: { width: number }) {
   const resultBoxesHistory = useAtomValue(resultBoxesHistoryAtom);
   const jaLabel = useAtomValue(labelsJaLabelMapAtom);
-  const [promptDialogMessage, setPromptDialogMessage] = useAtom(
-    promptDialogMessageAtom
-  );
+  const setPromptDialogMessage = useSetAtom(promptDialogMessageAtom);
 
   // history results
   const anchorRef = useRef<HTMLDivElement>(null);

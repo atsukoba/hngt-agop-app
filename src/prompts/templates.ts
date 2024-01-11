@@ -1,3 +1,10 @@
+import { PromptTemplate } from "@langchain/core/prompts";
+
+const prompt = new PromptTemplate({
+  inputVariables: ["product"],
+  template: "{product}を作る日本語の新会社名をを1つ提案してください",
+});
+
 export enum LLMContentType {
   // "詩" | "SF" | "学術的説明"
   "poem" = "詩",
