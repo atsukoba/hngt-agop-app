@@ -31,7 +31,7 @@ export default function YoloCamera() {
   const [cameraOn, setCameraOn] = useAtom(isCameraOn);
   // cameras
   const setCameras = useSetAtom(currentCamerasAtom);
-  const setCamera = useSetAtom(currentCameraAtom);
+  const [camera, setCamera] = useAtom(currentCameraAtom);
 
   // model
   const modelName = "yolov8n.onnx";
@@ -55,13 +55,8 @@ export default function YoloCamera() {
   const cameraCanvasRef = useRef<HTMLCanvasElement>(null);
   const boxCanvasRef = useRef<HTMLCanvasElement>(null);
 
-  // prompts
-  const [promptDialogMessage, setPromptDialogMessage] = useAtom(
-    promptDialogMessageAtom
-  );
-
   // loading
-  const [loadingMessage, setLoadingMessage] = useAtom(loadingMessageAtom);
+  const setLoadingMessage = useSetAtom(loadingMessageAtom);
 
   const initOrtSession = async () => {
     // wait until opencv.js initialized
@@ -80,32 +75,6 @@ export default function YoloCamera() {
       const testRes = await yolov8.run({ images: tensor });
       console.log("model output :", testRes);
       setSession({ net: yolov8, nms: nms });
-    }
-  };
-
-  const handleCameraChange = (m: MediaDeviceInfo) => {
-    /**
-     * @description init camera setings
-     */
-    setCamera(m);
-    const video = videoRef.current;
-    if (video) {
-      navigator.mediaDevices
-        .getUserMedia({
-          video: {
-            deviceId: m.deviceId,
-            width: {
-              ideal: 1920,
-            },
-            height: {
-              ideal: 1080,
-            },
-          },
-        })
-        .then((stream) => {
-          video.srcObject = stream;
-          video.play();
-        });
     }
   };
 
@@ -137,15 +106,50 @@ export default function YoloCamera() {
      * @description set camera on mount
      */
     setCameraOn(true);
-    setLoadingMessage(LoadingMessages.SETUP_CAMERA);
     navigator.mediaDevices.enumerateDevices().then((mediaDevices) => {
       const devices = mediaDevices.filter(({ kind }) => kind === "videoinput");
       setCameras(devices);
       if (devices.length) {
-        handleCameraChange(devices[0]);
+        setCamera(devices[0]);
       }
     });
   }, []);
+
+  useEffect(() => {
+    /**
+     * @description set camera on change
+     */
+    setLoadingMessage(LoadingMessages.SETUP_CAMERA);
+    const video = videoRef.current;
+    if (camera && video) {
+      navigator.mediaDevices
+        .getUserMedia({
+          audio: false,
+          video: {
+            deviceId: camera.deviceId,
+            width: {
+              ideal: 1920,
+            },
+            height: {
+              ideal: 1080,
+            },
+            facingMode: {
+              ideal: "environment",
+            },
+          },
+        })
+        .then((stream) => {
+          video.srcObject = stream;
+          video.play();
+        })
+        .catch((err) => {
+          alert("Failed to set up camera" + err.message);
+        })
+        .finally(() => {
+          setLoadingMessage(undefined);
+        });
+    }
+  }, [camera]);
 
   useEffect(() => {
     /**
