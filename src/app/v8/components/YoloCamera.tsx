@@ -14,7 +14,6 @@ import {
   iouThreshold,
   isCameraOn,
   loadingMessageAtom,
-  promptDialogMessageAtom,
   resultBoxesHistoryAtom,
   scoreThreshold,
   topK,
@@ -126,7 +125,9 @@ export default function YoloCamera() {
         .getUserMedia({
           audio: false,
           video: {
-            deviceId: camera.deviceId,
+            deviceId: {
+              exact: camera.deviceId,
+            },
             width: {
               ideal: 1920,
             },
