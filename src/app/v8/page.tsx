@@ -13,8 +13,8 @@ export default function App() {
       */}
       <YoloCamera />
       <LMDisplay />
-      <DetectStatus width={200} />
       <AppFooter />
+      <DetectStatus width={200} />
       <Loading />
     </main>
   );

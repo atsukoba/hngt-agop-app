@@ -41,14 +41,15 @@ export default function DetectStatus({ width = 200 }: { width: number }) {
         width: `${width}px`,
       }}
     >
+      <div className="h-8"></div>
       {resultBoxesHistory.map(
         (boxes, i) =>
           boxes.length !== 0 && (
             <div
-              className="card-compact w-full bg-base-100 bg-opacity-50 shadow-md rounded-md"
+              className="card-compact w-full bg-base-100 bg-opacity-50 shadow-md rounded-md animate-in fade-in-20"
               key={`detected_labels_${i}`}
             >
-              <div className="card-body animate-in fade-in-5">
+              <div className="card-body">
                 {boxes.map((box, j) => (
                   <div
                     key={`detected_label_${labels[box.labelIndex]}_${j}`}
@@ -81,7 +82,7 @@ export default function DetectStatus({ width = 200 }: { width: number }) {
             </div>
           )
       )}
-      <div ref={anchorRef}></div>
+      <div className="w-full h-[64px]" ref={anchorRef}></div>
     </section>
   );
 }

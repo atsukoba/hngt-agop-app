@@ -3,21 +3,16 @@ import Link from "next/link";
 export default function App() {
   return (
     <div
-      className="hero min-h-screen bg-base-200 relative"
+      className="w-full min-h-screen bg-base-200 relative"
       style={{
         backgroundImage: "url(/images/agop_forest.jpg)",
         backgroundSize: "cover",
         backgroundPosition: "center",
       }}
     >
-      <div className="hero-content text-left">
-        <div className="max-w-4xl">
-          <h1
-            className="my-6 text-7xl font-mono"
-            style={{
-              width: "fit-content",
-            }}
-          >
+      <div className="flex justify-center items-center max-w-full min-h-screen text-left">
+        <div className="p-8 md:max-w-4xl max-w-full">
+          <h1 className="my-6 text-6xl font-mono">
             AGOP: A Garden of Prosthesis AI App 2024
           </h1>
           <p className="my-6 italic animate-in fade-in-5">
