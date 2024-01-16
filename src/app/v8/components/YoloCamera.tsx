@@ -11,6 +11,7 @@ import {
   currentCameraAtom,
   currentCamerasAtom,
   inferenceCountAtom,
+  inferenceIntervalAtom,
   iouThreshold,
   isCameraOn,
   loadingMessageAtom,
@@ -20,6 +21,10 @@ import {
 } from "@/utils/states";
 import { LoadingMessages } from "@/utils/consts";
 import { isSameInferenceBoxes } from "@/utils/data";
+
+const wait = async (ms: number) => {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+};
 
 export default function YoloCamera() {
   // element sizes
@@ -39,11 +44,12 @@ export default function YoloCamera() {
 
   // inference
   const [session, setSession] = useState<InferenceSessionSet | null>(null);
-  const [inferenceCount, setInferenceCount] = useAtom(inferenceCountAtom);
+  const setInferenceCount = useSetAtom(inferenceCountAtom);
   const [resultBoxes, setResultBoxes] = useAtom(currentBoxesAtom);
   const [resultBoxesHistory, setResultBoxesHistory] = useAtom(
     resultBoxesHistoryAtom
   );
+  const inferenceInterval = useAtomValue(inferenceIntervalAtom);
   const topKVal = useAtomValue(topK);
   const iouThresholdVal = useAtomValue(iouThreshold);
   const scoreThresholdVal = useAtomValue(scoreThreshold);
@@ -156,43 +162,34 @@ export default function YoloCamera() {
     /**
      * @description inference loop
      */
-
-    // check if all refs are ready
-    if (cameraCanvasRef.current === null || session === null || !cameraOn) {
-      const ctx = boxCanvasRef.current?.getContext("2d", {
-        willReadFrequently: true,
-      });
-      ctx?.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height); // clean canvas
-      return;
-    }
-    // get data on each update
-    videoRef.current &&
-      cameraCanvasRef.current
-        .getContext("2d", {
+    (async () => {
+      // check if all refs are ready
+      if (cameraCanvasRef.current === null || session === null || !cameraOn) {
+        const ctx = boxCanvasRef.current?.getContext("2d", {
           willReadFrequently: true,
-        })
-        ?.drawImage(videoRef.current, 0, 0, elementWidth, elementHeight);
-    // update the bb view
-    boxCanvasRef.current && renderBoxes(boxCanvasRef.current, resultBoxes);
-    // trigger next inference
-    detectImage(
-      cameraCanvasRef.current,
-      session,
-      modelInputShape,
-      topKVal,
-      iouThresholdVal,
-      scoreThresholdVal
-    ).then((boxes) => {
-      // console.log(
-      //   `${inferenceCount}: objects`,
-      //   boxes.map((b) => labels[b.labelIndex]),
-      //   "params",
-      //   {
-      //     topKVal,
-      //     iouThresholdVal,
-      //     scoreThresholdVal,
-      //   }
-      // );
+        });
+        ctx?.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height); // clean canvas
+        return;
+      }
+      // get data on each update
+      videoRef.current &&
+        cameraCanvasRef.current
+          .getContext("2d", {
+            willReadFrequently: true,
+          })
+          ?.drawImage(videoRef.current, 0, 0, elementWidth, elementHeight);
+      // update the bb view
+      boxCanvasRef.current && renderBoxes(boxCanvasRef.current, resultBoxes);
+      // trigger next inference
+      await wait(inferenceInterval);
+      const boxes = await detectImage(
+        cameraCanvasRef.current,
+        session,
+        modelInputShape,
+        topKVal,
+        iouThresholdVal,
+        scoreThresholdVal
+      );
       setInferenceCount((prev) => prev + 1);
       setResultBoxes(boxes);
       if (
@@ -208,7 +205,7 @@ export default function YoloCamera() {
           return newHistory;
         });
       }
-    });
+    })();
   }, [resultBoxes, cameraOn]);
 
   useEffect(() => {

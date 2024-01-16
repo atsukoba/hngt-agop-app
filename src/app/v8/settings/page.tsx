@@ -154,13 +154,13 @@ const YoloModeSettings = () => {
           {InfoIcon(
             "Interval betwenn each inference / 生成後に次の推論を行うまでの秒数 "
           )}
-          Inference Interval (sec): {inferenceInterval}
+          Inference Interval (ms): {inferenceInterval}
         </h3>
         <input
           type="range"
           min={0}
-          max={60}
-          step={1}
+          max={4000}
+          step={100}
           value={inferenceInterval}
           onChange={(e) => setInferenceInterval(Number(e.target.value))}
           className="range range-primary col-span-3 md:col-span-2"
