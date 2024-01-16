@@ -18,7 +18,7 @@ export const scoreThreshold = atomWithStorage<number>(
 );
 export const inferenceIntervalAtom = atomWithStorage<number>(
   "agop_inferenceInterval",
-  0
+  500
 );
 
 // detection result
