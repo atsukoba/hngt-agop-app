@@ -9,7 +9,7 @@ export default function LMDisplay() {
     if (typeof window !== "undefined" && "speechSynthesis" in window) {
       const uttr = new SpeechSynthesisUtterance();
       uttr.lang = "ja-JP";
-      uttr.pitch = 0.75;
+      uttr.pitch = 0.9;
       uttr.volume = 0.75;
       uttr.text = text;
       window.speechSynthesis.speak(uttr);

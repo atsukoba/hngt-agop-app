@@ -15,6 +15,15 @@ const fetchGenerate = async (
   });
 };
 
+/**
+ * @description Using the OpenAI API to get the response, and update the
+ * response text state
+ * @param prompt Prompt text
+ * @param token OpenAI API seqret key
+ * @param updateCallback: (str) => void
+ * @param modelName
+ * @returns
+ */
 export const updateLlmResponse = async (
   prompt: string,
   token: string,
@@ -32,7 +41,7 @@ export const updateLlmResponse = async (
     if (done) break;
     const decodedText = new TextDecoder().decode(value);
     text += decodedText;
-    updateCallback(text);
   }
+  updateCallback(text);
   return text;
 };
