@@ -1,5 +1,33 @@
 import { PromptTemplate } from "@langchain/core/prompts";
 
+export const validateObjectTemplate = (template: string, nObjects: number) => {
+  if (template.length === 0) {
+    return false;
+  }
+  if (nObjects === 1) {
+    if (!template.includes("{object}")) {
+      return false;
+    }
+  }
+  if (nObjects === 2) {
+    if (!template.includes("{object1}") || !template.includes("{object2}")) {
+      return false;
+    }
+  }
+  if (nObjects >= 3) {
+    if (
+      !(
+        template.includes("{object1}") &&
+        template.includes("{object2}") &&
+        template.includes("{object3}")
+      )
+    ) {
+      return false;
+    }
+  }
+  return true;
+};
+
 const prompt = new PromptTemplate({
   inputVariables: ["product"],
   template: "{product}を作る日本語の新会社名をを1つ提案してください",

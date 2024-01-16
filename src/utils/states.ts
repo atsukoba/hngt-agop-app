@@ -16,6 +16,10 @@ export const scoreThreshold = atomWithStorage<number>(
   "agop_scoreThreshold",
   0.2
 );
+export const inferenceIntervalAtom = atomWithStorage<number>(
+  "agop_inferenceInterval",
+  0
+);
 
 // detection result
 export const resultBoxesHistoryAtom = atom<InferenceBox[][]>([[]]);
