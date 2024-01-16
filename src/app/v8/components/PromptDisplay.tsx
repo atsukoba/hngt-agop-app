@@ -1,9 +1,11 @@
 "use client";
 
 import { updateLlmResponse } from "@/utils/api";
+import { LoadingMessages } from "@/utils/consts";
 import {
   apiKeyAtom,
   llmResponseAtom,
+  loadingMessageAtom,
   modelNameAtom,
   promptDialogMessageAtom,
 } from "@/utils/states";
@@ -33,13 +35,22 @@ export default function PromptDisplay({
   ...props
 }: DetailedHTMLProps<HTMLAttributes<HTMLDivElement>, HTMLDivElement>) {
   const promptDialogMessage = useAtomValue(promptDialogMessageAtom);
+  const loadingMessage = useSetAtom(loadingMessageAtom);
   const token = useAtomValue(apiKeyAtom);
   const modelName = useAtomValue(modelNameAtom);
   const setLlmsResponse = useSetAtom(llmResponseAtom);
 
   useEffect(() => {
     if (promptDialogMessage) {
-      updateLlmResponse(promptDialogMessage, token, setLlmsResponse, modelName);
+      loadingMessage(LoadingMessages.GENERATING);
+      updateLlmResponse(
+        promptDialogMessage,
+        token,
+        setLlmsResponse,
+        modelName
+      ).finally(() => {
+        loadingMessage(undefined);
+      });
     }
   }, [promptDialogMessage]);
 
