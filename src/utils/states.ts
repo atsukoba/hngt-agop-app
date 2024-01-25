@@ -35,7 +35,11 @@ export const describeIntervalSecAtom = atomWithStorage<number>(
 );
 export const descibeModeBasePromptAtom = atomWithStorage<string>(
   "agop_descibeModeBasePromptAtom",
-  "Describe the image above in Japanese, and English follows after the token <lang>"
+  "Your're the robot exploring and seeking objects on 'the garden of prosthesis'. Describe the your view above in Japanese."
+);
+export const descibeModeRoleAtom = atomWithStorage<string>(
+  "agop_descibeModeRoleAtom",
+  "Your the robot explorer walking and seeking on the garden."
 );
 
 // camera

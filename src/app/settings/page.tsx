@@ -4,6 +4,7 @@ import { validateObjectTemplate } from "@/prompts/templates";
 import {
   apiKeyAtom,
   descibeModeBasePromptAtom,
+  descibeModeRoleAtom,
   describeIntervalSecAtom,
   inferenceIntervalAtom,
   iouThreshold,
@@ -270,6 +271,7 @@ const YoloModeSettings = () => {
 
 const GPT4ImageCaptioningModeSettings = () => {
   const [prompt, setPrompt] = useAtom(descibeModeBasePromptAtom);
+  const [role, setRole] = useAtom(descibeModeRoleAtom);
   const [descInterval, setDescInterval] = useAtom(describeIntervalSecAtom);
 
   return (
@@ -286,6 +288,19 @@ const GPT4ImageCaptioningModeSettings = () => {
           className="input input-primary w-full"
           value={prompt}
           onChange={(e) => setPrompt(e.target.value)}
+        />
+      </div>
+      <div className="mb-8">
+        <h3 className="font-bold text-md mb-4">
+          {InfoIcon("OpenAI secret token")}
+          Role / GPT-4の役割
+        </h3>
+        <input
+          type="text"
+          placeholder="input your API token here"
+          className="input input-primary w-full"
+          value={role}
+          onChange={(e) => setRole(e.target.value)}
         />
       </div>
       <div className="mb-8">

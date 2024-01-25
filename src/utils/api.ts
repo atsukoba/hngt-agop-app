@@ -64,6 +64,7 @@ const fetchDescription = async (
  * @description Using the OpenAI API to get the response, and update the
  * response text state
  * @param prompt Prompt text
+ * @param role Prompt text
  * @param token OpenAI API seqret key
  * @param updateCallback: (str) => void
  * @param modelName

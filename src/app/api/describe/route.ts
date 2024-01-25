@@ -29,15 +29,14 @@ export async function POST(req: Request) {
               type: "image_url",
               image_url: {
                 url: base64Image,
-                detail: "auto",
+                detail: "high",
               },
             },
           ],
         },
       ],
+      max_tokens: 1024,
     })
     .asResponse();
-
-  console.log(response);
   return response;
 }
