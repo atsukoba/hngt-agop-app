@@ -77,16 +77,10 @@ export const updateDescribeResponse = async (
 ) => {
   updateCallback("");
   const res = await fetchDescription(base64Image, prompt, token);
+  const data = await res.json();
   // parse readable stream with server event
-  const reader = res.body?.getReader();
-  let text = "";
-  while (true) {
-    if (!reader) break;
-    const { done, value } = await reader.read();
-    if (done) break;
-    const decodedText = new TextDecoder().decode(value);
-    text += decodedText;
-  }
-  updateCallback(text);
-  return text;
+  console.log(data);
+  const content = data.choices[0].message.content;
+  updateCallback(content);
+  return content;
 };

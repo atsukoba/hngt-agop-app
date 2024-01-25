@@ -11,7 +11,13 @@ import { labels } from "@/yolo/label";
 import { useAtomValue, useSetAtom } from "jotai/react";
 import { useEffect, useRef } from "react";
 
-export default function DetectStatus({ width = 200 }: { width: number }) {
+export default function DetectStatus({
+  width = 200,
+  showChatPromptButton = true,
+}: {
+  width: number;
+  showChatPromptButton: boolean;
+}) {
   const resultBoxesHistory = useAtomValue(resultBoxesHistoryAtom);
   const jaLabel = useAtomValue(labelsJaLabelMapAtom);
   const setPromptDialogMessage = useSetAtom(promptDialogMessageAtom);
@@ -66,7 +72,7 @@ export default function DetectStatus({ width = 200 }: { width: number }) {
                     </span>
                   </div>
                 ))}
-                {boxes.length > 1 && (
+                {boxes.length > 1 && showChatPromptButton && (
                   <div className="card-actions justify-end">
                     <button
                       className="btn btn-sm btn-primary btn-outline"

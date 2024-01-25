@@ -11,10 +11,10 @@ export default function App() {
         all the child components are positioned absolute.
         each component has its own comtainer with full width and height.
       */}
-      <YoloCamera />
+      <YoloCamera doImageDesc />
       <LMDisplay />
       <AppFooter />
-      <DetectStatus width={200} />
+      <DetectStatus width={200} showChatPromptButton={false} />
       <Loading />
     </main>
   );

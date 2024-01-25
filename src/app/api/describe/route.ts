@@ -28,8 +28,8 @@ export async function POST(req: Request) {
             {
               type: "image_url",
               image_url: {
-                url: `data:image/jpeg;base64,${base64Image}`,
-                detail: "low",
+                url: base64Image,
+                detail: "auto",
               },
             },
           ],
@@ -38,9 +38,6 @@ export async function POST(req: Request) {
     })
     .asResponse();
 
-  // Convert the response into a friendly text-stream
-  const stream = OpenAIStream(response);
-
-  // Respond with the stream
-  return new StreamingTextResponse(stream);
+  console.log(response);
+  return response;
 }

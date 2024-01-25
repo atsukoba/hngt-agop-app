@@ -1,5 +1,9 @@
 "use client";
-import { detectImage, renderBoxes } from "@/yolo/image_processing";
+import {
+  converttoBase64,
+  detectImage,
+  renderBoxes,
+} from "@/yolo/image_processing";
 import { useEffect, useRef, useState } from "react";
 
 import * as ort from "onnxruntime-web";
@@ -7,13 +11,17 @@ import { InferenceSessionSet } from "@/utils/types";
 import { labels } from "@/yolo/label";
 import { useAtom, useAtomValue, useSetAtom } from "jotai/react";
 import {
+  apiKeyAtom,
   currentBoxesAtom,
   currentCameraAtom,
   currentCamerasAtom,
+  descibeModeBasePromptAtom,
+  describeIntervalSecAtom,
   inferenceCountAtom,
   inferenceIntervalAtom,
   iouThreshold,
   isCameraOn,
+  llmResponseAtom,
   loadingMessageAtom,
   resultBoxesHistoryAtom,
   scoreThreshold,
@@ -21,12 +29,17 @@ import {
 } from "@/utils/states";
 import { LoadingMessages } from "@/utils/consts";
 import { isSameInferenceBoxes } from "@/utils/data";
+import { updateDescribeResponse } from "@/utils/api";
 
 const wait = async (ms: number) => {
   return new Promise((resolve) => setTimeout(resolve, ms));
 };
 
-export default function YoloCamera() {
+export default function YoloCamera({
+  doImageDesc = false,
+}: {
+  doImageDesc: boolean;
+}) {
   // element sizes
   const [elementWidth, setElementWidth] = useState<number>(0);
   const [elementHeight, setElementHeight] = useState<number>(0);
@@ -54,6 +67,11 @@ export default function YoloCamera() {
   const iouThresholdVal = useAtomValue(iouThreshold);
   const scoreThresholdVal = useAtomValue(scoreThreshold);
 
+  // llm image description mode
+  const token = useAtomValue(apiKeyAtom);
+  const descibeModeBasePrompt = useAtomValue(descibeModeBasePromptAtom);
+  const describeIntervalSec = useAtomValue(describeIntervalSecAtom);
+  const setLlmsResponse = useSetAtom(llmResponseAtom);
   // refs
   const containerRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -207,6 +225,31 @@ export default function YoloCamera() {
       }
     })();
   }, [resultBoxes, cameraOn]);
+
+  doImageDesc &&
+    useEffect(() => {
+      /**
+       * @description image description mode
+       */
+      console.log(
+        "image description mode: desc interval:",
+        describeIntervalSec
+      );
+      const interval = setInterval(() => {
+        if (cameraCanvasRef.current) {
+          const base64 = converttoBase64(cameraCanvasRef.current);
+          console.log(base64);
+          setLoadingMessage(LoadingMessages.GENERATING);
+          updateDescribeResponse(
+            base64,
+            descibeModeBasePrompt,
+            token,
+            setLlmsResponse
+          ).finally(() => setLoadingMessage(undefined));
+        }
+      }, describeIntervalSec * 1000);
+      return () => clearInterval(interval);
+    }, [cameraCanvasRef.current, token, descibeModeBasePrompt]);
 
   useEffect(() => {
     /**
