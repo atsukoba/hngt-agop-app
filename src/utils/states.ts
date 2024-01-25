@@ -28,6 +28,16 @@ export const labelsJaLabelMapAtom = atom<{ [key in Label]: string }>(
   defaultLabelsJaLabelMap
 );
 
+// image description model inference
+export const describeIntervalSecAtom = atomWithStorage<number>(
+  "agop_describeInterval",
+  60
+);
+export const descibeModeBasePromptAtom = atomWithStorage<string>(
+  "agop_descibeModeBasePromptAtom",
+  "Describe the image above in Japanese, and English follows after the token <lang>"
+);
+
 // camera
 export const isCameraOn = atom<boolean>(false);
 export const currentCameraAtom = atom<MediaDeviceInfo | null>(null);
@@ -39,8 +49,8 @@ export const promptDialogMessageAtom = atom<string>("");
 export const llmResponseAtom = atom<string>("");
 
 // OpenAI API
-export const chatIdAtom = atomWithStorage<string>("agop_chatIdAtom", uuidv4());
 export const apiKeyAtom = atomWithStorage<string>("agop_apiKeyAtom", "");
+// chat
 export const modelNameAtom = atomWithStorage<string>(
   "agop_modelNameAtom",
   "gpt-3.5-turbo-0301"

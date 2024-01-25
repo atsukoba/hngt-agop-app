@@ -7,7 +7,7 @@ import {
 } from "@/utils/states";
 import { useAtom } from "jotai/react";
 import { useRouter } from "next/navigation";
-import PromptDisplay from "@/app/v8/components/PromptDisplay";
+import PromptDisplay from "@/app/components/PromptDisplay";
 
 export default function AppFooter() {
   const router = useRouter();
@@ -23,7 +23,7 @@ export default function AppFooter() {
           <button
             onClick={(_) => {
               setCameraOn(false);
-              router.push("/v8/settings");
+              router.push("/settings");
             }}
             className="btn btn-primary"
           >

@@ -20,6 +20,14 @@ const nextConfig = {
             from: "./node_modules/onnxruntime-web/dist/ort-wasm-simd.wasm",
             to: "static/chunks/app/v8",
           },
+          {
+            from: "./node_modules/onnxruntime-web/dist/ort-wasm.wasm",
+            to: "static/chunks/app/llm",
+          },
+          {
+            from: "./node_modules/onnxruntime-web/dist/ort-wasm-simd.wasm",
+            to: "static/chunks/app/llm",
+          },
           // FIXME: need to copy to both the root of the app and the demo_v8 folder
           {
             from: "./node_modules/onnxruntime-web/dist/ort-wasm.wasm",

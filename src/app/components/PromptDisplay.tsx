@@ -1,6 +1,6 @@
 "use client";
 
-import { updateLlmResponse } from "@/utils/api";
+import { updateChatResponse } from "@/utils/api";
 import { LoadingMessages } from "@/utils/consts";
 import {
   apiKeyAtom,
@@ -43,7 +43,7 @@ export default function PromptDisplay({
   useEffect(() => {
     if (promptDialogMessage) {
       loadingMessage(LoadingMessages.GENERATING);
-      updateLlmResponse(
+      updateChatResponse(
         promptDialogMessage,
         token,
         setLlmsResponse,

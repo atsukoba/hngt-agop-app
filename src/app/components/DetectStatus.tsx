@@ -69,7 +69,7 @@ export default function DetectStatus({ width = 200 }: { width: number }) {
                 {boxes.length > 1 && (
                   <div className="card-actions justify-end">
                     <button
-                      className="btn btn-sm btn-primary"
+                      className="btn btn-sm btn-primary btn-outline"
                       onClick={(e) => {
                         issueNewPrompt(boxes);
                       }}
