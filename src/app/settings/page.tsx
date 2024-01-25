@@ -18,7 +18,7 @@ import { labels, labelsIconMap } from "@/yolo/label";
 import { useAtom, useSetAtom } from "jotai/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const InfoIcon = (tooltipMsg: string) => (
   <div className="tooltip tooltip-right" data-tip={tooltipMsg}>
@@ -282,13 +282,12 @@ const GPT4ImageCaptioningModeSettings = () => {
           {InfoIcon("OpenAI secret token")}
           Prompt / 画像キャプション生成のためのプロンプト
         </h3>
-        <input
-          type="text"
-          placeholder="input your API token here"
-          className="input input-primary w-full"
+        <textarea
+          className={`textarea textarea-lg textarea-primary w-full`}
           value={prompt}
+          placeholder="input prompt here / プロンプトを入力してください"
           onChange={(e) => setPrompt(e.target.value)}
-        />
+        ></textarea>
       </div>
       {/* <div className="mb-8">
         <h3 className="font-bold text-md mb-4">
@@ -334,6 +333,19 @@ export default function SettingPage() {
   // use referer path
   const [currentTab, setCurrentTab] = useState(0);
 
+  // useEffect(() => {
+  //   if (window) {
+  //     switch (window.history.state.prevUrl.pathname) {
+  //       case "/v8":
+  //         setCurrentTab(0);
+  //         break;
+  //       case "/llm":
+  //         setCurrentTab(1);
+  //         break;
+  //     }
+  //   }
+  // }, []);
+
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="w-full flex justify-between flex-row">
@@ -353,23 +365,38 @@ export default function SettingPage() {
 
       <div className="mb-8">
         <div className="mb-8">
-          <h3 className="font-bold text-md mb-4">
+          <h3 className="font-bold text-lg mb-4">
             {InfoIcon("OpenAI secret token")}
             OpenAI API
           </h3>
           <p className="mb-8">
-            Set the OpenAI API token to use the LLM. You can get from &nbsp;
+            Set the OpenAI API token to use the LLM. / OpenAI APIのsecret
+            keyを取得してください。 &nbsp;
             <Link
               href="https://platform.openai.com/api-keys"
               className="underline"
+              target="_blank"
             >
               https://platform.openai.com/api-keys
             </Link>
             . &nbsp;
           </p>
+          <p className="mb-8">
+            You can see how much you have used the API from following link /
+            利用状況の確認はこちら &nbsp;
+            <Link
+              href="https://platform.openai.com/usage"
+              className="underline"
+              target="_blank"
+            >
+              https://platform.openai.com/usage
+            </Link>
+            . &nbsp;
+          </p>
           <div className="label">
             <span className="label-text">
-              Do not publish your API token to the public.
+              Do not publish your API token to the public. /
+              トークンは公開しないでください。
             </span>
           </div>
           <input
@@ -391,7 +418,7 @@ export default function SettingPage() {
             type="radio"
             name="setting_tabs"
             role="tab"
-            className="tab"
+            className={`tab`}
             aria-label="YOLO Mode"
             checked={currentTab === 0}
             onChange={(e) => setCurrentTab(0)}
@@ -407,7 +434,7 @@ export default function SettingPage() {
             type="radio"
             name="setting_tabs"
             role="tab"
-            className="tab"
+            className={`tab`}
             aria-label="GPT-4 Mode"
             checked={currentTab === 1}
             onChange={(e) => setCurrentTab(1)}

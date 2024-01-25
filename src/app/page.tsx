@@ -12,7 +12,7 @@ export default function App() {
     >
       <div className="flex justify-center items-center max-w-full min-h-screen text-left">
         <div className="p-8 md:max-w-4xl max-w-full">
-          <h1 className="my-6 text-6xl font-mono">
+          <h1 className="my-6 text-5xl font-mono font-bold">
             AGOP: A Garden of Prosthesis AI App 2024
           </h1>
           <p className="my-6 italic animate-in fade-in-5">
@@ -28,20 +28,18 @@ export default function App() {
             この《庭》では、理性的な人間たちが他物たちを利用するという関係を逸脱し、オブジェクトたちが《庭師》によってマゾヒスティックに、あるいはキメラ的に《接木》され、癒合する。それによって、この「正常な社会」の内部に、捻れた関係の裂け目としての島宇宙的な外部を生成することを試みる。そして、その周囲にあるものすべてを－あなたを－この《庭》へと巻き込みながら、その裂け目としての外部へと躍り出る！
           </p>
           <div className="flex flex-row justify-center my-6">
-            <button className="btn btn-outline">
-              <Link href={"/v8"} className="text-3xl align-middle">
-                START APP &nbsp;
-                <span className="text-2xl font-mono">ver:YOLO-v8</span>
+            <button className="btn btn-outline font-light">
+              <Link href={"/v8"} className="text-2xl align-middle">
+                START &nbsp;
+                <span className="text-2xl">ver:YOLO-v8</span>
               </Link>
             </button>
           </div>
           <div className="flex flex-row justify-center my-6">
-            <button className="btn btn-outline">
-              <Link href={"/llm"} className="text-3xl align-middle">
-                START APP &nbsp;
-                <span className="text-2xl font-mono">
-                  ver:GPT-4 Description
-                </span>
+            <button className="btn btn-outline font-light">
+              <Link href={"/llm"} className="text-2xl align-middle">
+                START &nbsp;
+                <span className="text-2xl">ver:GPT-4 Description</span>
               </Link>
             </button>
           </div>
