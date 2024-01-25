@@ -35,7 +35,7 @@ export const describeIntervalSecAtom = atomWithStorage<number>(
 );
 export const descibeModeBasePromptAtom = atomWithStorage<string>(
   "agop_descibeModeBasePromptAtom",
-  "Your're the robot exploring and seeking objects on 'the garden of prosthesis'. Describe the your view above in Japanese."
+  "Describe the objects on your view in Japanese, like you're the robot explorer walking and seeking on the garden."
 );
 export const descibeModeRoleAtom = atomWithStorage<string>(
   "agop_descibeModeRoleAtom",

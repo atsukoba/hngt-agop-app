@@ -275,7 +275,7 @@ const GPT4ImageCaptioningModeSettings = () => {
   const [descInterval, setDescInterval] = useAtom(describeIntervalSecAtom);
 
   return (
-    <>
+    <div className="min-h-screen">
       <h2 className="font-bold text-2xl mb-8">Prompt</h2>
       <div className="mb-8">
         <h3 className="font-bold text-md mb-4">
@@ -290,7 +290,7 @@ const GPT4ImageCaptioningModeSettings = () => {
           onChange={(e) => setPrompt(e.target.value)}
         />
       </div>
-      <div className="mb-8">
+      {/* <div className="mb-8">
         <h3 className="font-bold text-md mb-4">
           {InfoIcon("OpenAI secret token")}
           Role / GPT-4の役割
@@ -302,12 +302,8 @@ const GPT4ImageCaptioningModeSettings = () => {
           value={role}
           onChange={(e) => setRole(e.target.value)}
         />
-      </div>
+      </div> */}
       <div className="mb-8">
-        <h3 className="font-bold text-md mb-4">
-          {InfoIcon("OpenAI secret token")}
-          Automation / 自動化
-        </h3>
         <div className="mb-8 grid md:grid-cols-3 gap-2">
           <h3 className="font-bold text-md mb-8 col-span-1">
             {InfoIcon(
@@ -326,7 +322,7 @@ const GPT4ImageCaptioningModeSettings = () => {
           />
         </div>
       </div>
-    </>
+    </div>
   );
 };
 
@@ -335,6 +331,7 @@ export default function SettingPage() {
 
   const setCameraOn = useSetAtom(isCameraOn);
   const [token, setToken] = useAtom(apiKeyAtom);
+  // use referer path
   const [currentTab, setCurrentTab] = useState(0);
 
   return (
@@ -355,16 +352,10 @@ export default function SettingPage() {
       <div className="divider"></div>
 
       <div className="mb-8">
-        <h3 className="font-bold text-md mb-4">
-          {InfoIcon("OpenAI secret token")}
-          Automation / 自動化
-        </h3>
-        <p className="mb-8">生成の自動化の設定です。</p>
-
         <div className="mb-8">
           <h3 className="font-bold text-md mb-4">
             {InfoIcon("OpenAI secret token")}
-            OpenAI
+            OpenAI API
           </h3>
           <p className="mb-8">
             Set the OpenAI API token to use the LLM. You can get from &nbsp;
