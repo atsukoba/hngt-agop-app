@@ -5,16 +5,16 @@ import {
   currentCamerasAtom,
   isCameraOn,
 } from "@/utils/states";
-import { useAtom } from "jotai/react";
+import { useAtom, useAtomValue, useSetAtom } from "jotai/react";
 import { useRouter } from "next/navigation";
 import PromptDisplay from "@/app/components/PromptDisplay";
 
 export default function AppFooter() {
   const router = useRouter();
 
-  const [cameras, setCameras] = useAtom(currentCamerasAtom);
-  const [camera, setCamera] = useAtom(currentCameraAtom);
-  const [cameraOn, setCameraOn] = useAtom(isCameraOn);
+  const cameras = useAtomValue(currentCamerasAtom);
+  const setCamera = useSetAtom(currentCameraAtom);
+  const setCameraOn = useSetAtom(isCameraOn);
 
   return (
     <div className="app__footer absolute left-0 bottom-0 px-4 py-2 w-full h-16 flex flex-row justify-between gap-4 bg-black bg-opacity-50">
