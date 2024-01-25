@@ -35,7 +35,7 @@ export async function POST(req: Request) {
           ],
         },
       ],
-      max_tokens: 1024,
+      max_tokens: 512,
     })
     .asResponse();
   return response;
