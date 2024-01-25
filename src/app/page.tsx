@@ -35,6 +35,16 @@ export default function App() {
               </Link>
             </button>
           </div>
+          <div className="flex flex-row justify-center my-6">
+            <button className="btn btn-outline">
+              <Link href={"/llm"} className="text-3xl align-middle">
+                START APP &nbsp;
+                <span className="text-2xl font-mono">
+                  ver:GPT-4 Description
+                </span>
+              </Link>
+            </button>
+          </div>
         </div>
       </div>
     </div>
