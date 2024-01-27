@@ -1,9 +1,8 @@
-import YoloCamera from "../components/YoloCamera";
 import AppFooter from "../components/AppFooter";
 import DetectStatus from "../components/DetectStatus";
-import Loading from "../components/Loading";
 import LMDisplay from "../components/LMDisplay";
-import { use } from "react";
+import Loading from "../components/Loading";
+import YoloCamera from "../components/YoloCamera";
 
 export default function App() {
   return (

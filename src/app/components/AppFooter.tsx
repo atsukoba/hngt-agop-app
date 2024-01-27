@@ -36,7 +36,7 @@ export default function AppFooter({
 
   return (
     <div className="app__footer absolute left-0 bottom-0 px-4 py-2 w-full h-16 flex flex-row justify-between gap-4 bg-black bg-opacity-50">
-      <div className="flex flex-row justify-start gap-4">
+      <div className="flex flex-row justify-start gap-4 items-center">
         <div className="w-24">
           <button
             onClick={(_) => {
@@ -57,6 +57,17 @@ export default function AppFooter({
             </div>
           </button>
         </div>
+        <button
+          className="btn btn-outline"
+          onClick={() => {
+            if (typeof window !== "undefined") {
+              document.body.requestFullscreen();
+            }
+          }}
+        >
+          Full <br />
+          Screen
+        </button>
         <select
           className="select select-accent w-full max-w-sm"
           onChange={(e) =>
