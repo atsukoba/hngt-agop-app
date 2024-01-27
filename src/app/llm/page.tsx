@@ -3,6 +3,7 @@ import AppFooter from "../components/AppFooter";
 import DetectStatus from "../components/DetectStatus";
 import Loading from "../components/Loading";
 import LMDisplay from "../components/LMDisplay";
+import { use } from "react";
 
 export default function App() {
   return (
@@ -13,7 +14,7 @@ export default function App() {
       */}
       <YoloCamera doImageDesc />
       <LMDisplay />
-      <AppFooter />
+      <AppFooter showDescTriggerBtn />
       <DetectStatus width={200} showChatPromptButton={false} />
       <Loading />
     </main>

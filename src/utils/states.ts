@@ -33,11 +33,17 @@ export const describeIntervalSecAtom = atomWithStorage<number>(
   "agop_describeInterval",
   60
 );
+export const currentIntervalTImeAtom = atom<number>(60);
 export const descibeModeBasePromptAtom = atomWithStorage<string>(
   "agop_descibeModeBasePromptAtom",
   "Describe the objects on your view in Japanese, like you're the robot explorer walking and seeking on the garden."
 );
 export const describeModeBase64ImageAtom = atom<string>("");
+export const imageShotFuncAtom = atom<{ call: () => string }>({
+  call: () => {
+    return "";
+  },
+});
 
 // camera
 export const isCameraOn = atom<boolean>(false);

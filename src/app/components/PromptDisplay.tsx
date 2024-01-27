@@ -1,15 +1,17 @@
 "use client";
 
-import { updateChatResponse } from "@/utils/api";
+import { updateChatResponse, updateDescribeResponse } from "@/utils/api";
 import { LoadingMessages } from "@/utils/consts";
 import {
   apiKeyAtom,
+  descibeModeBasePromptAtom,
+  describeModeBase64ImageAtom,
   llmResponseAtom,
   loadingMessageAtom,
   modelNameAtom,
   promptDialogMessageAtom,
 } from "@/utils/states";
-import { useAtomValue, useSetAtom } from "jotai/react";
+import { useAtom, useAtomValue, useSetAtom } from "jotai/react";
 import { DetailedHTMLProps, HTMLAttributes, useEffect, useState } from "react";
 
 const PromptWrap = ({ prompt }: { prompt: string }) => {
@@ -34,22 +36,49 @@ const PromptWrap = ({ prompt }: { prompt: string }) => {
 export default function PromptDisplay({
   ...props
 }: DetailedHTMLProps<HTMLAttributes<HTMLDivElement>, HTMLDivElement>) {
-  const promptDialogMessage = useAtomValue(promptDialogMessageAtom);
-  const loadingMessage = useSetAtom(loadingMessageAtom);
+  const [loadingMessage, setLoadingMessage] = useAtom(loadingMessageAtom);
   const token = useAtomValue(apiKeyAtom);
+
+  // obj detect mode
+  const promptDialogMessage = useAtomValue(promptDialogMessageAtom);
   const modelName = useAtomValue(modelNameAtom);
+
+  // describe mode
+  const [descriptionState, setDescriptionState] = useState<string>("");
+  const image = useAtomValue(describeModeBase64ImageAtom);
+  const descPrompt = useAtomValue(descibeModeBasePromptAtom);
+
+  // update llm response
   const setLlmsResponse = useSetAtom(llmResponseAtom);
 
   useEffect(() => {
+    /**
+     * @description trigger image description when image is updated
+     */
+    if (image) {
+      setLoadingMessage(LoadingMessages.GENERATING);
+      updateDescribeResponse(image, descPrompt, token, setLlmsResponse).finally(
+        () => {
+          setLoadingMessage(undefined);
+        }
+      );
+    }
+  }, [image]);
+
+  useEffect(() => {
+    /**
+     * @description trigger chat response when prompt built from the results
+     * of object detection is updated
+     */
     if (promptDialogMessage) {
-      loadingMessage(LoadingMessages.GENERATING);
+      setLoadingMessage(LoadingMessages.GENERATING);
       updateChatResponse(
         promptDialogMessage,
         token,
         setLlmsResponse,
         modelName
       ).finally(() => {
-        loadingMessage(undefined);
+        setLoadingMessage(undefined);
       });
     }
   }, [promptDialogMessage]);

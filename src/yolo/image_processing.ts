@@ -4,7 +4,7 @@ import * as ort from "onnxruntime-web";
 import { labels } from "@/yolo/label";
 import { InferenceBox, InferenceSessionSet } from "@/utils/types";
 
-export const converttoBase64 = (source: HTMLCanvasElement) => {
+export const convertToBase64 = (source: HTMLCanvasElement) => {
   return source.toDataURL("image/jpeg");
 };
 

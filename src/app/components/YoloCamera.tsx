@@ -1,6 +1,6 @@
 "use client";
 import {
-  converttoBase64,
+  convertToBase64,
   detectImage,
   renderBoxes,
 } from "@/yolo/image_processing";
@@ -15,8 +15,11 @@ import {
   currentBoxesAtom,
   currentCameraAtom,
   currentCamerasAtom,
+  currentIntervalTImeAtom,
   descibeModeBasePromptAtom,
   describeIntervalSecAtom,
+  describeModeBase64ImageAtom,
+  imageShotFuncAtom,
   inferenceCountAtom,
   inferenceIntervalAtom,
   iouThreshold,
@@ -68,10 +71,13 @@ export default function YoloCamera({
   const scoreThresholdVal = useAtomValue(scoreThreshold);
 
   // llm image description mode
-  const token = useAtomValue(apiKeyAtom);
-  const descibeModeBasePrompt = useAtomValue(descibeModeBasePromptAtom);
   const describeIntervalSec = useAtomValue(describeIntervalSecAtom);
-  const setLlmsResponse = useSetAtom(llmResponseAtom);
+  const [currentIntervalTIme, setCurrentIntervalTime] = useAtom(
+    currentIntervalTImeAtom
+  );
+  const setImageShotFunc = useSetAtom(imageShotFuncAtom);
+  const setImage = useSetAtom(describeModeBase64ImageAtom);
+
   // refs
   const containerRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -226,31 +232,6 @@ export default function YoloCamera({
     })();
   }, [resultBoxes, cameraOn]);
 
-  doImageDesc &&
-    useEffect(() => {
-      /**
-       * @description image description mode
-       */
-      console.log(
-        "image description mode: desc interval:",
-        describeIntervalSec
-      );
-      const interval = setInterval(() => {
-        if (cameraCanvasRef.current) {
-          const base64 = converttoBase64(cameraCanvasRef.current);
-          console.log(base64);
-          setLoadingMessage(LoadingMessages.GENERATING);
-          updateDescribeResponse(
-            base64,
-            descibeModeBasePrompt,
-            token,
-            setLlmsResponse
-          ).finally(() => setLoadingMessage(undefined));
-        }
-      }, describeIntervalSec * 1000);
-      return () => clearInterval(interval);
-    }, [cameraCanvasRef.current, token, descibeModeBasePrompt]);
-
   useEffect(() => {
     /**
      *  @description initial detection to trigger inference loop
@@ -266,6 +247,53 @@ export default function YoloCamera({
       );
     }
   }, [session]);
+
+  doImageDesc &&
+    useEffect(() => {
+      /**
+       * @description image description mode: init timer
+       */
+      console.log(
+        "image description mode: desc interval:",
+        describeIntervalSec
+      );
+      if (!cameraCanvasRef.current) {
+        return;
+      }
+      setImageShotFunc({
+        // image conversion function for other components
+        call: () => {
+          const base64 = convertToBase64(cameraCanvasRef.current!);
+          console.log("image shot", base64);
+          return base64;
+        },
+      });
+    }, [cameraCanvasRef.current, describeIntervalSec, setCurrentIntervalTime]);
+
+  doImageDesc &&
+    /**
+     * @description counter
+     */
+    useEffect(() => {
+      setTimeout(() => {
+        if (currentIntervalTIme === 1) {
+          setCurrentIntervalTime(describeIntervalSec);
+        } else {
+          setCurrentIntervalTime((prev) => prev - 1);
+        }
+      }, 1000);
+    }, [currentIntervalTIme, describeIntervalSec]);
+
+  doImageDesc &&
+    useEffect(() => {
+      /**
+       * @description trigger image description by updating image data
+       */
+      if (currentIntervalTIme === describeIntervalSec) {
+        const base64 = convertToBase64(cameraCanvasRef.current!);
+        setImage(base64);
+      }
+    }, [cameraCanvasRef.current, currentIntervalTIme, describeIntervalSec]);
 
   return (
     <div className="w-full h-full relative" ref={containerRef}>

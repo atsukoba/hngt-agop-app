@@ -3,18 +3,36 @@
 import {
   currentCameraAtom,
   currentCamerasAtom,
+  currentIntervalTImeAtom,
+  descibeModeBasePromptAtom,
+  describeIntervalSecAtom,
+  describeModeBase64ImageAtom,
+  imageShotFuncAtom,
   isCameraOn,
+  loadingMessageAtom,
 } from "@/utils/states";
 import { useAtom, useAtomValue, useSetAtom } from "jotai/react";
 import { useRouter } from "next/navigation";
 import PromptDisplay from "@/app/components/PromptDisplay";
+import { useEffect } from "react";
+import { updateDescribeResponse } from "@/utils/api";
 
-export default function AppFooter() {
+export default function AppFooter({
+  showDescTriggerBtn = false,
+}: {
+  showDescTriggerBtn?: boolean;
+}) {
   const router = useRouter();
+  const [loadingMessage, setLoadingMessage] = useAtom(loadingMessageAtom);
 
   const cameras = useAtomValue(currentCamerasAtom);
   const setCamera = useSetAtom(currentCameraAtom);
   const setCameraOn = useSetAtom(isCameraOn);
+
+  const imageShotFunc = useAtomValue(imageShotFuncAtom);
+  const [image, setImage] = useAtom(describeModeBase64ImageAtom);
+  const currentIntervalTIme = useAtomValue(currentIntervalTImeAtom);
+  const descIntervalTime = useAtomValue(describeIntervalSecAtom);
 
   return (
     <div className="app__footer absolute left-0 bottom-0 px-4 py-2 w-full h-16 flex flex-row justify-between gap-4 bg-black bg-opacity-50">
@@ -26,6 +44,7 @@ export default function AppFooter() {
               router.push("/settings");
             }}
             className="btn btn-primary"
+            disabled={loadingMessage !== undefined}
           >
             <div
               className="tooltip tooltip-right"
@@ -50,6 +69,42 @@ export default function AppFooter() {
             </option>
           ))}
         </select>
+        {showDescTriggerBtn && (
+          <>
+            <div>
+              <button
+                onClick={(_) => {
+                  const base64 = imageShotFunc.call();
+                  setImage(base64);
+                }}
+                className="btn btn-accent btn-outline"
+              >
+                <div
+                  className="tooltip tooltip-top"
+                  data-tip={"Trigger Image Description"}
+                >
+                  Describe
+                </div>
+              </button>
+            </div>
+            <div className="w-12">
+              <div
+                className="radial-progress text-accent"
+                style={
+                  {
+                    "--value": Math.floor(
+                      100 * (currentIntervalTIme / descIntervalTime)
+                    ),
+                    "--size": "3rem",
+                  } as any
+                }
+                role="progressbar"
+              >
+                {currentIntervalTIme}
+              </div>
+            </div>
+          </>
+        )}
       </div>
       <PromptDisplay className="flex-grow flex flex-col justify-center align-middle" />
     </div>
