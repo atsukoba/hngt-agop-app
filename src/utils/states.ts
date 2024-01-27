@@ -72,3 +72,12 @@ export const discordWebhookUrlAtom = atomWithStorage<string>(
   "agop_discordWebhookUrlAtom",
   ""
 );
+
+export const voicePitchAtom = atomWithStorage<number>(
+  "agop_voicePitchAtom",
+  1.0
+);
+export const voiceSpeedAtom = atomWithStorage<number>(
+  "agop_voiceSpeedAtom",
+  1.0
+);

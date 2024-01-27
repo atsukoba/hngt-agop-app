@@ -12,11 +12,13 @@ import {
   modelNameAtom,
   scoreThreshold,
   topK,
+  voicePitchAtom,
+  voiceSpeedAtom,
 } from "@/utils/states";
-import { labels, labelsIconMap } from "@/yolo/label";
-import { useAtom, useSetAtom } from "jotai/react";
+import { labels } from "@/yolo/label";
+import { useAtom, useAtomValue, useSetAtom } from "jotai/react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
 const InfoIcon = (tooltipMsg: string) => (
@@ -323,26 +325,94 @@ const GPT4ImageCaptioningModeSettings = () => {
   );
 };
 
+const SpeechTest = () => {
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [text, setText] = useState(
+    "あのイーハトーヴォのすきとおった風、夏でも底に冷たさをもつ青いそら、うつくしい森で飾られたモリーオ市、郊外のぎらぎらひかる草の波。"
+  );
+  const voicePitch = useAtomValue(voicePitchAtom);
+  const voiceSpeed = useAtomValue(voiceSpeedAtom);
+
+  const readAloud = (text: string) => {
+    if (typeof window !== "undefined" && "speechSynthesis" in window) {
+      setIsPlaying(true);
+      const uttr = new SpeechSynthesisUtterance();
+      uttr.lang = "ja-JP";
+      uttr.pitch = voicePitch;
+      uttr.volume = 1.0;
+      uttr.rate = voiceSpeed;
+      uttr.text = text;
+      window.speechSynthesis.speak(uttr);
+    }
+  };
+  const speakStop = () => {
+    if (typeof window !== "undefined" && "speechSynthesis" in window) {
+      setIsPlaying(false);
+      window.speechSynthesis.cancel();
+    }
+  };
+  return (
+    // play/pause icon to toggle the speech
+    <div className="flex flex-row gap-4">
+      <button
+        className={"btn btn-primary btn-sm btn-outline"}
+        onClick={(e) => {
+          if (typeof window !== "undefined" && "speechSynthesis" in window) {
+            if (window.speechSynthesis.speaking) {
+              speakStop();
+            } else {
+              readAloud(text);
+            }
+          }
+        }}
+      >
+        {isPlaying ? (
+          <p className={`icon-[mdi--pause] w-5 h-5`} />
+        ) : (
+          <p className={`icon-[mdi--play] w-5 h-5`} />
+        )}
+        声をテストする
+      </button>
+      <input
+        type="text"
+        placeholder="input your API token here"
+        className="input input-primary input-sm w-full flex-grow"
+        value={text}
+        onChange={(e) => setText(e.target.value)}
+      />
+    </div>
+  );
+};
+
+/**
+ *
+ * @description This component is for main settings configuration
+ */
 export default function SettingPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   const setCameraOn = useSetAtom(isCameraOn);
   const [token, setToken] = useAtom(apiKeyAtom);
-  // use referer path
+
   const [currentTab, setCurrentTab] = useState(0);
 
-  // useEffect(() => {
-  //   if (window) {
-  //     switch (window.history.state.prevUrl.pathname) {
-  //       case "/v8":
-  //         setCurrentTab(0);
-  //         break;
-  //       case "/llm":
-  //         setCurrentTab(1);
-  //         break;
-  //     }
-  //   }
-  // }, []);
+  const [voicePitch, setvoicePitch] = useAtom(voicePitchAtom);
+  const [voiceSpeed, setvoiceSpeed] = useAtom(voiceSpeedAtom);
+
+  useEffect(() => {
+    const mode = searchParams.get("mode");
+    switch (mode) {
+      case undefined:
+        setCurrentTab(1);
+      case "yolo":
+        setCurrentTab(0);
+        break;
+      case "gpt4":
+        setCurrentTab(1);
+        break;
+    }
+  }, [searchParams]);
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -363,10 +433,7 @@ export default function SettingPage() {
 
       <div className="mb-8">
         <div className="mb-8">
-          <h3 className="font-bold text-lg mb-4">
-            {InfoIcon("OpenAI secret token")}
-            OpenAI API
-          </h3>
+          <h3 className="font-bold text-lg mb-4">OpenAI API</h3>
           <p className="mb-8">
             Set the OpenAI API token to use the LLM. / OpenAI APIのsecret
             keyを取得してください。 &nbsp;
@@ -404,6 +471,49 @@ export default function SettingPage() {
             value={token}
             onChange={(e) => setToken(e.target.value)}
           />
+        </div>
+
+        <div className="mb-8 grid md:grid-cols-3 gap-2">
+          <h3 className="font-bold text-lg mb-4 col-span-1">
+            Voice Settings / 声の設定
+          </h3>
+        </div>
+
+        <div className="mb-8 grid md:grid-cols-3 gap-2">
+          <h3 className="font-bold text-md mb-8 col-span-1">
+            {InfoIcon("自動音声の声の高さの設定です / Voice Pitch")}
+            声の高さ / Voice Pitch: {voicePitch}
+          </h3>
+          <input
+            type="range"
+            min={0.25}
+            max={2.5}
+            step={0.1}
+            value={voicePitch}
+            onChange={(e) => setvoicePitch(Number(e.target.value))}
+            className="range range-primary col-span-3 md:col-span-2"
+          />
+        </div>
+        <div className="mb-8 grid md:grid-cols-3 gap-2">
+          <h3 className="font-bold text-md mb-8 col-span-1">
+            {InfoIcon("自動音声の声の高さの設定です / Voice Pitch")}
+            発話スピード / Speech Speed: {voiceSpeed}
+          </h3>
+          <input
+            type="range"
+            min={0.25}
+            max={2.5}
+            step={0.1}
+            value={voiceSpeed}
+            onChange={(e) => setvoiceSpeed(Number(e.target.value))}
+            className="range range-primary col-span-3 md:col-span-2"
+          />
+        </div>
+        <div className="mb-8 grid md:grid-cols-3 gap-2">
+          <div></div>
+          <div className="col-span-3 md:col-span-2">
+            <SpeechTest />
+          </div>
         </div>
 
         <div className="divider"></div>

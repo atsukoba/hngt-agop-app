@@ -18,9 +18,9 @@ import { useEffect } from "react";
 import { updateDescribeResponse } from "@/utils/api";
 
 export default function AppFooter({
-  showDescTriggerBtn = false,
+  gpt4mode = false,
 }: {
-  showDescTriggerBtn?: boolean;
+  gpt4mode?: boolean;
 }) {
   const router = useRouter();
   const [loadingMessage, setLoadingMessage] = useAtom(loadingMessageAtom);
@@ -41,7 +41,7 @@ export default function AppFooter({
           <button
             onClick={(_) => {
               setCameraOn(false);
-              router.push("/settings");
+              router.push(`/settings?mode=${gpt4mode ? "gpt4" : "yolo"}`);
             }}
             className="btn btn-primary"
             disabled={loadingMessage !== undefined}
@@ -69,7 +69,7 @@ export default function AppFooter({
             </option>
           ))}
         </select>
-        {showDescTriggerBtn && (
+        {gpt4mode && (
           <>
             <div>
               <button

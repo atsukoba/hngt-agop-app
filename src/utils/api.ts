@@ -76,7 +76,6 @@ export const updateDescribeResponse = async (
   token: string,
   updateCallback: any
 ) => {
-  updateCallback("");
   const res = await fetchDescription(base64Image, prompt, token);
   const data = await res.json();
   // parse readable stream with server event

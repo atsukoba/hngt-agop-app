@@ -1,16 +1,27 @@
 "use client";
 
-import { llmResponseAtom } from "@/utils/states";
+import {
+  llmResponseAtom,
+  voicePitchAtom,
+  voiceSpeedAtom,
+} from "@/utils/states";
 import { useAtomValue } from "jotai/react";
-import { useEffect } from "react";
+import { use, useEffect } from "react";
 
+/**
+ * @description This component is responsible for displaying the response from the LLM.
+ */
 export default function LMDisplay() {
+  const llmResponse = useAtomValue(llmResponseAtom);
+  const voicePitch = useAtomValue(voicePitchAtom);
+  const voiceSpeed = useAtomValue(voiceSpeedAtom);
+
   const readAloud = (text: string) => {
     if (typeof window !== "undefined" && "speechSynthesis" in window) {
       const uttr = new SpeechSynthesisUtterance();
       uttr.lang = "ja-JP";
-      uttr.pitch = 0.9;
-      uttr.volume = 0.75;
+      uttr.pitch = voicePitch;
+      uttr.volume = voiceSpeed;
       uttr.text = text;
       window.speechSynthesis.speak(uttr);
     }
@@ -21,8 +32,6 @@ export default function LMDisplay() {
       window.speechSynthesis.cancel();
     }
   };
-
-  const llmResponse = useAtomValue(llmResponseAtom);
 
   useEffect(() => {
     if (llmResponse !== "") {
