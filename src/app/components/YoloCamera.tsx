@@ -276,7 +276,7 @@ export default function YoloCamera({
      */
     useEffect(() => {
       setTimeout(() => {
-        if (currentIntervalTIme === 1) {
+        if (currentIntervalTIme === 0) {
           setCurrentIntervalTime(describeIntervalSec);
         } else {
           setCurrentIntervalTime((prev) => prev - 1);
@@ -289,7 +289,7 @@ export default function YoloCamera({
       /**
        * @description trigger image description by updating image data
        */
-      if (currentIntervalTIme === describeIntervalSec) {
+      if (currentIntervalTIme === 0) {
         const base64 = convertToBase64(cameraCanvasRef.current!);
         setImage(base64);
       }

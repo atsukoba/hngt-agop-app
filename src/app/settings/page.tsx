@@ -375,8 +375,8 @@ const SpeechTest = () => {
       </button>
       <input
         type="text"
-        placeholder="input your API token here"
-        className="input input-primary input-sm w-full flex-grow"
+        placeholder="サンプルテキスト"
+        className="input input-bordered input-sm w-full flex-grow"
         value={text}
         onChange={(e) => setText(e.target.value)}
       />

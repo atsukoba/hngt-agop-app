@@ -34,10 +34,9 @@ export default function LMDisplay() {
   };
 
   useEffect(() => {
+    speakStop();
     if (llmResponse !== "") {
       readAloud(llmResponse);
-    } else {
-      speakStop();
     }
   }, [llmResponse]);
 

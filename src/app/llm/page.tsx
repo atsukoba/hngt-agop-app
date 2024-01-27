@@ -15,7 +15,7 @@ export default function App() {
       <YoloCamera doImageDesc />
       <LMDisplay />
       <AppFooter gpt4mode />
-      <DetectStatus width={200} showChatPromptButton={false} />
+      <DetectStatus width={150} showChatPromptButton={false} />
       <Loading />
     </main>
   );
