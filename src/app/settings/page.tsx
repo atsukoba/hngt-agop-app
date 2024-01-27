@@ -4,7 +4,6 @@ import { validateObjectTemplate } from "@/prompts/templates";
 import {
   apiKeyAtom,
   descibeModeBasePromptAtom,
-  descibeModeRoleAtom,
   describeIntervalSecAtom,
   inferenceIntervalAtom,
   iouThreshold,
@@ -271,7 +270,6 @@ const YoloModeSettings = () => {
 
 const GPT4ImageCaptioningModeSettings = () => {
   const [prompt, setPrompt] = useAtom(descibeModeBasePromptAtom);
-  const [role, setRole] = useAtom(descibeModeRoleAtom);
   const [descInterval, setDescInterval] = useAtom(describeIntervalSecAtom);
 
   return (

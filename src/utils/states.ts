@@ -37,10 +37,7 @@ export const descibeModeBasePromptAtom = atomWithStorage<string>(
   "agop_descibeModeBasePromptAtom",
   "Describe the objects on your view in Japanese, like you're the robot explorer walking and seeking on the garden."
 );
-export const descibeModeRoleAtom = atomWithStorage<string>(
-  "agop_descibeModeRoleAtom",
-  "Your the robot explorer walking and seeking on the garden."
-);
+export const describeModeBase64ImageAtom = atom<string>("");
 
 // camera
 export const isCameraOn = atom<boolean>(false);
@@ -51,6 +48,10 @@ export const currentCamerasAtom = atom<MediaDeviceInfo[]>([]);
 export const isPromptDialogOpenAtom = atom<boolean>(false);
 export const promptDialogMessageAtom = atom<string>("");
 export const llmResponseAtom = atom<string>("");
+export const llmResponseHistoryAtom = atomWithStorage<string[]>(
+  "agop_llmResponseHistoryAtom",
+  []
+);
 
 // OpenAI API
 export const apiKeyAtom = atomWithStorage<string>("agop_apiKeyAtom", "");
@@ -58,4 +59,10 @@ export const apiKeyAtom = atomWithStorage<string>("agop_apiKeyAtom", "");
 export const modelNameAtom = atomWithStorage<string>(
   "agop_modelNameAtom",
   "gpt-3.5-turbo-0301"
+);
+
+// logging
+export const discordWebhookUrlAtom = atomWithStorage<string>(
+  "agop_discordWebhookUrlAtom",
+  ""
 );
