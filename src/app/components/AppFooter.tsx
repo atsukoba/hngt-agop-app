@@ -3,6 +3,7 @@
 import PromptDisplay from "@/app/components/PromptDisplay";
 import { updateDescribeResponse } from "@/utils/api";
 import { LoadingMessages } from "@/utils/consts";
+import { postDIscordWebhook } from "@/utils/logging";
 import {
   apiKeyAtom,
   currentCameraAtom,
@@ -11,6 +12,7 @@ import {
   descibeModeBasePromptAtom,
   describeIntervalSecAtom,
   describeModeBase64ImageAtom,
+  discordWebhookUrlAtom,
   imageShotFuncAtom,
   isAutoDescribeOnAtom,
   isCameraOn,
@@ -41,6 +43,7 @@ export default function AppFooter({
   const descIntervalTime = useAtomValue(describeIntervalSecAtom);
   const [descriptionState, setDescriptionState] = useState<string>("");
   const descPrompt = useAtomValue(descibeModeBasePromptAtom);
+  const webhook = useAtomValue(discordWebhookUrlAtom);
 
   const setLlmsResponse = useSetAtom(llmResponseAtom);
 
@@ -50,11 +53,17 @@ export default function AppFooter({
      */
     if (image) {
       setLoadingMessage(LoadingMessages.GENERATING);
-      updateDescribeResponse(image, descPrompt, token, setLlmsResponse).finally(
-        () => {
+      updateDescribeResponse(image, descPrompt, token, setLlmsResponse)
+        .then((content: string) =>
+          postDIscordWebhook(
+            webhook,
+            "Prompt: " + descPrompt + "\rResponse: " + content,
+            image
+          )
+        )
+        .finally(() => {
           setLoadingMessage(undefined);
-        }
-      );
+        });
     }
   }, [image]);
 

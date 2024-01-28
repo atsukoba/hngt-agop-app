@@ -5,6 +5,7 @@ import {
   apiKeyAtom,
   descibeModeBasePromptAtom,
   describeIntervalSecAtom,
+  discordWebhookUrlAtom,
   inferenceIntervalAtom,
   iouThreshold,
   isCameraOn,
@@ -394,6 +395,7 @@ export default function SettingPage() {
 
   const setCameraOn = useSetAtom(isCameraOn);
   const [token, setToken] = useAtom(apiKeyAtom);
+  const [webhook, setWebhook] = useAtom(discordWebhookUrlAtom);
 
   const [currentTab, setCurrentTab] = useState(0);
 
@@ -479,12 +481,13 @@ export default function SettingPage() {
           />
         </div>
 
+        <div className="divider"></div>
+
         <div className="mb-8 grid md:grid-cols-3 gap-2">
           <h3 className="font-bold text-lg mb-4 col-span-1">
             Voice Settings / 声の設定
           </h3>
         </div>
-
         <div className="mb-8 grid md:grid-cols-3 gap-2">
           <h3 className="font-bold text-md mb-8 col-span-1">
             {InfoIcon("自動音声の声の高さの設定です / Voice Pitch")}
@@ -520,6 +523,18 @@ export default function SettingPage() {
           <div className="col-span-3 md:col-span-2">
             <SpeechTest />
           </div>
+        </div>
+        <div className="divider"></div>
+        <div className="my-12">
+          <h3 className="font-bold text-lg mb-4">Webhook URL (Discord)</h3>
+          <p className="mb-8">Set the Webhook URL to the Discord Webhook.</p>
+          <input
+            type="url"
+            placeholder="input Webhook URL"
+            className="input input-bordered w-full"
+            value={webhook}
+            onChange={(e) => setWebhook(e.target.value)}
+          />
         </div>
 
         <div className="divider"></div>
