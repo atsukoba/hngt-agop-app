@@ -46,6 +46,12 @@ const YoloModeSettings = () => {
   const [object2Template, setObject2Template] = useState("");
   const [object3orMoreTemplate, setObject3orMoreTemplate] = useState("");
 
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      document.exitFullscreen();
+    }
+  }, []);
+
   return (
     <>
       <h2 className="font-bold text-2xl mb-8">Language Model Settings</h2>

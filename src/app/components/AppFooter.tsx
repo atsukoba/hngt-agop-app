@@ -1,6 +1,10 @@
 "use client";
 
+import PromptDisplay from "@/app/components/PromptDisplay";
+import { updateDescribeResponse } from "@/utils/api";
+import { LoadingMessages } from "@/utils/consts";
 import {
+  apiKeyAtom,
   currentCameraAtom,
   currentCamerasAtom,
   currentIntervalTImeAtom,
@@ -8,14 +12,14 @@ import {
   describeIntervalSecAtom,
   describeModeBase64ImageAtom,
   imageShotFuncAtom,
+  isAutoDescribeOnAtom,
   isCameraOn,
+  llmResponseAtom,
   loadingMessageAtom,
 } from "@/utils/states";
 import { useAtom, useAtomValue, useSetAtom } from "jotai/react";
 import { useRouter } from "next/navigation";
-import PromptDisplay from "@/app/components/PromptDisplay";
-import { useEffect } from "react";
-import { updateDescribeResponse } from "@/utils/api";
+import { useEffect, useState } from "react";
 
 export default function AppFooter({
   gpt4mode = false,
@@ -29,15 +33,35 @@ export default function AppFooter({
   const setCamera = useSetAtom(currentCameraAtom);
   const setCameraOn = useSetAtom(isCameraOn);
 
+  const token = useAtomValue(apiKeyAtom);
   const imageShotFunc = useAtomValue(imageShotFuncAtom);
   const [image, setImage] = useAtom(describeModeBase64ImageAtom);
+  const [isAutoDescribeOn, setIsAutoDescribeOn] = useAtom(isAutoDescribeOnAtom);
   const currentIntervalTIme = useAtomValue(currentIntervalTImeAtom);
   const descIntervalTime = useAtomValue(describeIntervalSecAtom);
+  const [descriptionState, setDescriptionState] = useState<string>("");
+  const descPrompt = useAtomValue(descibeModeBasePromptAtom);
+
+  const setLlmsResponse = useSetAtom(llmResponseAtom);
+
+  useEffect(() => {
+    /**
+     * @description trigger image description when image is updated
+     */
+    if (image) {
+      setLoadingMessage(LoadingMessages.GENERATING);
+      updateDescribeResponse(image, descPrompt, token, setLlmsResponse).finally(
+        () => {
+          setLoadingMessage(undefined);
+        }
+      );
+    }
+  }, [image]);
 
   return (
     <div className="app__footer absolute left-0 bottom-0 px-4 py-2 w-full h-16 flex flex-row justify-between gap-4 bg-black bg-opacity-50">
-      <div className="flex flex-row justify-start gap-4 items-center">
-        <div className="w-24">
+      <div className="flex flex-row justify-start gap-4 items-center w-full">
+        <div>
           <button
             onClick={(_) => {
               setCameraOn(false);
@@ -80,23 +104,20 @@ export default function AppFooter({
             </option>
           ))}
         </select>
-        {gpt4mode && (
-          <>
-            <div>
-              <button
-                onClick={(_) => {
-                  const base64 = imageShotFunc.call();
-                  setImage(base64);
-                }}
-                className="btn btn-accent btn-outline"
-              >
-                <div
-                  className="tooltip tooltip-top"
-                  data-tip={"Trigger Image Description"}
-                >
-                  Describe
-                </div>
-              </button>
+        {gpt4mode ? (
+          <div className="flex-grow flex flex-row justify-end gap-4">
+            <div className="form-control">
+              <label className="cursor-pointer label">
+                <span className="label-text mr-2">Auto Mode</span>
+                <input
+                  type="checkbox"
+                  className="toggle toggle-accent toggle-lg"
+                  checked={isAutoDescribeOn}
+                  onChange={(e) => {
+                    setIsAutoDescribeOn(e.target.checked);
+                  }}
+                />
+              </label>
             </div>
             <div className="w-12">
               <div
@@ -114,10 +135,30 @@ export default function AppFooter({
                 {currentIntervalTIme}
               </div>
             </div>
-          </>
+            <div>
+              <button
+                onClick={(_) => {
+                  const base64 = imageShotFunc.call();
+                  setImage(base64);
+                }}
+                className="btn btn-accent"
+              >
+                <div
+                  className="tooltip tooltip-top"
+                  data-tip={"Trigger Image Description"}
+                >
+                  <span
+                    className="icon-[mdi--camera] w-8 h-8"
+                    style={{ verticalAlign: "-0.3em" }}
+                  ></span>
+                </div>
+              </button>
+            </div>
+          </div>
+        ) : (
+          <PromptDisplay className="flex-grow flex flex-col justify-center align-middle" />
         )}
       </div>
-      <PromptDisplay className="flex-grow flex flex-col justify-center align-middle" />
     </div>
   );
 }

@@ -11,7 +11,7 @@ export const loadingMessageAtom = atom<LoadingMessages | undefined>(undefined);
 // object detection model inference
 export const inferenceCountAtom = atom<number>(0);
 export const topK = atomWithStorage<number>("agop_topK", 100);
-export const iouThreshold = atomWithStorage<number>("agop_iouThreshold", 0.35);
+export const iouThreshold = atomWithStorage<number>("agop_iouThreshold", 0.25);
 export const scoreThreshold = atomWithStorage<number>(
   "agop_scoreThreshold",
   0.2
@@ -28,12 +28,12 @@ export const labelsJaLabelMapAtom = atom<{ [key in Label]: string }>(
   defaultLabelsJaLabelMap
 );
 
-// image description model inference
+// image description model (GPT-4) inference
 export const describeIntervalSecAtom = atomWithStorage<number>(
   "agop_describeInterval",
-  60
+  180
 );
-export const currentIntervalTImeAtom = atom<number>(60);
+export const currentIntervalTImeAtom = atom<number>(180);
 export const descibeModeBasePromptAtom = atomWithStorage<string>(
   "agop_descibeModeBasePromptAtom",
   "Describe the objects on your view in Japanese, like you're the robot explorer walking and seeking on the garden."
@@ -44,6 +44,10 @@ export const imageShotFuncAtom = atom<{ call: () => string }>({
     return "";
   },
 });
+export const isAutoDescribeOnAtom = atomWithStorage<boolean>(
+  "agop_isAutoDescribeOnAtom",
+  false
+);
 
 // camera
 export const isCameraOn = atom<boolean>(false);

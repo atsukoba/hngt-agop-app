@@ -43,27 +43,8 @@ export default function PromptDisplay({
   const promptDialogMessage = useAtomValue(promptDialogMessageAtom);
   const modelName = useAtomValue(modelNameAtom);
 
-  // describe mode
-  const [descriptionState, setDescriptionState] = useState<string>("");
-  const image = useAtomValue(describeModeBase64ImageAtom);
-  const descPrompt = useAtomValue(descibeModeBasePromptAtom);
-
   // update llm response
   const setLlmsResponse = useSetAtom(llmResponseAtom);
-
-  useEffect(() => {
-    /**
-     * @description trigger image description when image is updated
-     */
-    if (image) {
-      setLoadingMessage(LoadingMessages.GENERATING);
-      updateDescribeResponse(image, descPrompt, token, setLlmsResponse).finally(
-        () => {
-          setLoadingMessage(undefined);
-        }
-      );
-    }
-  }, [image]);
 
   useEffect(() => {
     /**

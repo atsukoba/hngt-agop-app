@@ -8,23 +8,20 @@ import { useEffect, useRef, useState } from "react";
 
 import * as ort from "onnxruntime-web";
 import { InferenceSessionSet } from "@/utils/types";
-import { labels } from "@/yolo/label";
 import { useAtom, useAtomValue, useSetAtom } from "jotai/react";
 import {
-  apiKeyAtom,
   currentBoxesAtom,
   currentCameraAtom,
   currentCamerasAtom,
   currentIntervalTImeAtom,
-  descibeModeBasePromptAtom,
   describeIntervalSecAtom,
   describeModeBase64ImageAtom,
   imageShotFuncAtom,
   inferenceCountAtom,
   inferenceIntervalAtom,
   iouThreshold,
+  isAutoDescribeOnAtom,
   isCameraOn,
-  llmResponseAtom,
   loadingMessageAtom,
   resultBoxesHistoryAtom,
   scoreThreshold,
@@ -32,7 +29,6 @@ import {
 } from "@/utils/states";
 import { LoadingMessages } from "@/utils/consts";
 import { isSameInferenceBoxes } from "@/utils/data";
-import { updateDescribeResponse } from "@/utils/api";
 
 const wait = async (ms: number) => {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -71,6 +67,7 @@ export default function YoloCamera({
   const scoreThresholdVal = useAtomValue(scoreThreshold);
 
   // llm image description mode
+  const isAutoDescribeOn = useAtomValue(isAutoDescribeOnAtom);
   const describeIntervalSec = useAtomValue(describeIntervalSecAtom);
   const [currentIntervalTIme, setCurrentIntervalTime] = useAtom(
     currentIntervalTImeAtom
@@ -275,14 +272,15 @@ export default function YoloCamera({
      * @description counter
      */
     useEffect(() => {
-      setTimeout(() => {
-        if (currentIntervalTIme === 0) {
-          setCurrentIntervalTime(describeIntervalSec);
-        } else {
-          setCurrentIntervalTime((prev) => prev - 1);
-        }
-      }, 1000);
-    }, [currentIntervalTIme, describeIntervalSec]);
+      isAutoDescribeOn &&
+        setTimeout(() => {
+          if (currentIntervalTIme === 0) {
+            setCurrentIntervalTime(describeIntervalSec);
+          } else {
+            setCurrentIntervalTime((prev) => prev - 1);
+          }
+        }, 1000);
+    }, [isAutoDescribeOn, currentIntervalTIme, describeIntervalSec]);
 
   doImageDesc &&
     useEffect(() => {
