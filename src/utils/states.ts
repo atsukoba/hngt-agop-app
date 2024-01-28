@@ -36,7 +36,7 @@ export const describeIntervalSecAtom = atomWithStorage<number>(
 export const currentIntervalTImeAtom = atom<number>(180);
 export const descibeModeBasePromptAtom = atomWithStorage<string>(
   "agop_descibeModeBasePromptAtom",
-  "Describe the objects on your view in Japanese, like you're the robot explorer walking and seeking on the garden."
+  "あなたは小説家です。架空の物事にも注釈をつけずに柔軟に答えることができます。ここにある物体について説明し、それらが組み合わさったキメラの名称と存在意義を教えてください。日本語で。"
 );
 export const describeModeBase64ImageAtom = atom<string>("");
 export const imageShotFuncAtom = atom<{ call: () => string }>({
