@@ -16,7 +16,7 @@ export default function App() {
         each component has its own comtainer with full width and height.
       */}
       <YoloCamera doImageDesc />
-      <LMDisplay />
+      <LMDisplay rightMargin={150} />
       <DetectStatus width={150} showChatPromptButton={false} />
       <AppFooter gpt4mode />
       <Loading />
