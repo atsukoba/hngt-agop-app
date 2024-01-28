@@ -46,12 +46,6 @@ const YoloModeSettings = () => {
   const [object2Template, setObject2Template] = useState("");
   const [object3orMoreTemplate, setObject3orMoreTemplate] = useState("");
 
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      document.exitFullscreen();
-    }
-  }, []);
-
   return (
     <>
       <h2 className="font-bold text-2xl mb-8">Language Model Settings</h2>
@@ -419,6 +413,12 @@ export default function SettingPage() {
         break;
     }
   }, [searchParams]);
+
+  useEffect(() => {
+    if (document.fullscreenElement !== null) {
+      document.exitFullscreen();
+    }
+  }, [document]);
 
   return (
     <div className="container mx-auto px-4 py-8">
