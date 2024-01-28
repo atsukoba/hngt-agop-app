@@ -17,11 +17,12 @@ import {
   isAutoDescribeOnAtom,
   isCameraOn,
   llmResponseAtom,
+  llmSystemPromptAtom,
   loadingMessageAtom,
 } from "@/utils/states";
 import { useAtom, useAtomValue, useSetAtom } from "jotai/react";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
 export default function AppFooter({
   gpt4mode = false,
@@ -41,8 +42,8 @@ export default function AppFooter({
   const [isAutoDescribeOn, setIsAutoDescribeOn] = useAtom(isAutoDescribeOnAtom);
   const currentIntervalTIme = useAtomValue(currentIntervalTImeAtom);
   const descIntervalTime = useAtomValue(describeIntervalSecAtom);
-  const [descriptionState, setDescriptionState] = useState<string>("");
   const descPrompt = useAtomValue(descibeModeBasePromptAtom);
+  const systemPrompt = useAtomValue(llmSystemPromptAtom);
   const webhook = useAtomValue(discordWebhookUrlAtom);
 
   const setLlmsResponse = useSetAtom(llmResponseAtom);
@@ -53,11 +54,16 @@ export default function AppFooter({
      */
     if (image) {
       setLoadingMessage(LoadingMessages.GENERATING);
-      updateDescribeResponse(image, descPrompt, token, setLlmsResponse)
+      updateDescribeResponse(
+        image,
+        descPrompt + systemPrompt,
+        token,
+        setLlmsResponse
+      )
         .then((content: string) =>
           postDIscordWebhook(
             webhook,
-            "Prompt: " + descPrompt + "\rResponse: " + content,
+            "Prompt: " + descPrompt + systemPrompt + "\r\rResponse: " + content,
             image
           )
         )

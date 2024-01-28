@@ -37,29 +37,50 @@ const speakStop = () => {
  *
  * @description This component is responsible for displaying each line of the response text.
  */
-const LmResponseWrap = ({ response }: { response: string }) => {
-  const [currentResponse, setCurrentResponse] = useState("");
+const LmResponseWrap = ({
+  responseJa,
+  responseEn,
+}: {
+  responseJa: string;
+  responseEn?: string;
+}) => {
+  const [currentResponseJa, setCurrentResponseJa] = useState("");
+  const [currentResponseEn, setCurrentResponseEn] = useState("");
   useEffect(() => {
-    let cnt = 0;
-    if (!response) return;
+    let cnt = 1;
+    if (!responseJa) return;
     const runner = setInterval(() => {
-      const current = response.slice(0, cnt);
-      setCurrentResponse(current);
-      current === response && clearInterval(runner);
+      const longerLim =
+        Math.max(responseJa.length, responseEn?.length || 0) - 1;
+      const currentJa = responseJa.slice(0, cnt);
+      const currentEn = responseEn?.slice(0, cnt);
+      setCurrentResponseJa(currentJa);
+      responseEn && setCurrentResponseEn(responseEn.slice(0, cnt));
+      cnt === longerLim && clearInterval(runner);
       cnt++;
-    }, 30);
-  }, [response]);
+    }, 15);
+  }, [responseJa, responseEn]);
 
   return (
-    <div className="pb-16">
+    <div className="grid grid-rows-2 gap-8 min-h-full">
       <p
-        className="text-5xl font-serif animate-in fade-in-100 opacity-75"
+        className="row-span-1 text-5xl font-serif animate-in fade-in-100 opacity-75"
         style={{
           whiteSpace: "pre-wrap",
         }}
       >
-        {currentResponse}
+        {currentResponseJa}
       </p>
+      {currentResponseEn && (
+        <p
+          className="row-span-1 text-5xl font-serif animate-in fade-in-100 opacity-75"
+          style={{
+            whiteSpace: "pre-wrap",
+          }}
+        >
+          {currentResponseEn}
+        </p>
+      )}
     </div>
   );
 };
@@ -87,8 +108,17 @@ export default function LMDisplay({
   }, [llmResponse]);
 
   useEffect(() => {
+    const res = internalResposes[currentReadingIdx];
+    if (!res) return;
+    let text: string;
+    if (res.indexOf("[lang]") !== -1) {
+      text = res.split("[lang]")[0];
+    } else {
+      text = res;
+    }
+    if (text === "" || text === undefined) return;
     readAloud(
-      internalResposes[currentReadingIdx],
+      text,
       voicePitch,
       voiceSpeed,
       (e) => {
@@ -109,7 +139,14 @@ export default function LMDisplay({
         width: `calc(100% - ${rightMargin}px)`,
       }}
     >
-      <LmResponseWrap response={internalResposes[currentReadingIdx]} />
+      <LmResponseWrap
+        responseJa={
+          internalResposes[currentReadingIdx]?.split("[lang]")[0] || ""
+        }
+        responseEn={
+          internalResposes[currentReadingIdx]?.split("[lang]")[1] || ""
+        }
+      />
     </section>
   );
 }

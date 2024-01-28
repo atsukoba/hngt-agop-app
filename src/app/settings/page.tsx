@@ -10,6 +10,7 @@ import {
   iouThreshold,
   isCameraOn,
   labelsJaLabelMapAtom,
+  llmSystemPromptAtom,
   modelNameAtom,
   scoreThreshold,
   topK,
@@ -402,6 +403,8 @@ export default function SettingPage() {
   const [voicePitch, setvoicePitch] = useAtom(voicePitchAtom);
   const [voiceSpeed, setvoiceSpeed] = useAtom(voiceSpeedAtom);
 
+  const [systemPrompt, setSystemPrompt] = useAtom(llmSystemPromptAtom);
+
   useEffect(() => {
     const mode = searchParams.get("mode");
     switch (mode) {
@@ -439,9 +442,9 @@ export default function SettingPage() {
 
       <div className="divider"></div>
 
-      <div className="mb-8">
+      <div className="setting__Content mb-8">
         <div className="mb-8">
-          <h3 className="font-bold text-lg mb-4">OpenAI API</h3>
+          <h3 className="font-bold text-xl mb-4">OpenAI API</h3>
           <p className="mb-8">
             Set the OpenAI API token to use the LLM. / OpenAI APIのsecret
             keyを取得してください。 &nbsp;
@@ -483,11 +486,7 @@ export default function SettingPage() {
 
         <div className="divider"></div>
 
-        <div className="mb-8 grid md:grid-cols-3 gap-2">
-          <h3 className="font-bold text-lg mb-4 col-span-1">
-            Voice Settings / 声の設定
-          </h3>
-        </div>
+        <h3 className="font-bold text-xl mb-4">Voice Settings / 声の設定</h3>
         <div className="mb-8 grid md:grid-cols-3 gap-2">
           <h3 className="font-bold text-md mb-8 col-span-1">
             {InfoIcon("自動音声の声の高さの設定です / Voice Pitch")}
@@ -524,9 +523,11 @@ export default function SettingPage() {
             <SpeechTest />
           </div>
         </div>
+
         <div className="divider"></div>
-        <div className="my-12">
-          <h3 className="font-bold text-lg mb-4">Webhook URL (Discord)</h3>
+
+        <h3 className="font-bold text-xl mb-4">Webhook URL (Discord)</h3>
+        <div className="mb-8">
           <p className="mb-8">Set the Webhook URL to the Discord Webhook.</p>
           <input
             type="url"
@@ -538,6 +539,25 @@ export default function SettingPage() {
         </div>
 
         <div className="divider"></div>
+
+        <h3 className="font-bold text-xl mb-4">System Prompt</h3>
+        <div className="mb-8">
+          <p className="mb-8">
+            表示システムの制御のためのプロンプトです。設定したプロンプトの後ろに追記されて送信されます。
+          </p>
+          <input
+            type="url"
+            placeholder="input Webhook URL"
+            className="input input-bordered w-full"
+            value={systemPrompt}
+            onChange={(e) => setSystemPrompt(e.target.value)}
+            disabled
+          />
+        </div>
+
+        <div className="divider"></div>
+
+        <h3 className="font-bold text-xl mb-4">Model Control</h3>
 
         <div
           role="tablist"

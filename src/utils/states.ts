@@ -57,6 +57,13 @@ export const currentCamerasAtom = atom<MediaDeviceInfo[]>([]);
 // dialog state
 export const isPromptDialogOpenAtom = atom<boolean>(false);
 export const promptDialogMessageAtom = atom<string>("");
+
+// LLM
+export const llmSystemPromptAtom = atomWithStorage<string>(
+  "agop_llmSystemPrompt",
+  "回答は日本語で3行程度で行ってください。各行の後ろには「以上。[lang]That's all.」のように[lang]に続けて回答の英訳を追記してください。"
+);
+
 export const llmResponseAtom = atom<string>("");
 export const llmResponseHistoryAtom = atomWithStorage<string[]>(
   "agop_llmResponseHistoryAtom",
