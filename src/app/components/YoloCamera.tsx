@@ -105,6 +105,10 @@ export default function YoloCamera({
   };
 
   useEffect(() => {
+    /**
+     * @description init ort session
+     */
+    
     initOrtSession();
   }, []);
 
