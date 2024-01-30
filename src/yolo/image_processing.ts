@@ -1,7 +1,7 @@
 "use client";
 
 import * as ort from "onnxruntime-web";
-import { labels } from "@/yolo/label";
+import { labels, defaultLabelsJaLabelMap, getColorStr } from "@/yolo/label";
 import { InferenceBox, InferenceSessionSet } from "@/utils/types";
 
 export const convertToBase64 = (source: HTMLCanvasElement) => {
@@ -19,21 +19,33 @@ const preprocessing = async (
   source: HTMLCanvasElement,
   modelWidth: number,
   modelHeight: number
-): Promise<[any, number, number]> => {
+): Promise<[any, number, number, number]> => {
   const cv = window.cv;
   const mat = cv.imread(source); // read from img tag
   const matC3 = new cv.Mat(mat.rows, mat.cols, cv.CV_8UC3); // new image 3ch matrix [y, x]
   cv.cvtColor(mat, matC3, cv.COLOR_RGBA2BGR); // RGBA to BGR
 
   // padding image to [n x n] dim
+  console.log("model size (w, h):", modelWidth, modelHeight);
   const maxSize = Math.max(matC3.rows, matC3.cols); // get max size from width and height
-  const xPad = maxSize - matC3.cols; // set xPadding
-  const xRatio = matC3.cols / modelWidth; // set xRatio
-  const yPad = maxSize - matC3.rows; // set yPadding
-  const yRatio = matC3.rows / modelHeight; // set yRatio
+  console.log("input size (w, h):", matC3.cols, matC3.rows);
+  const ratio = maxSize / Math.min(modelHeight, modelWidth);
+  console.log("ratio:", ratio);
+  const xPad = modelWidth * ratio - matC3.cols; // set xPadding
+  const yPad = modelHeight * ratio - matC3.rows; // set yPadding
+  console.log("pad:", xPad, yPad);
+  // eather x or y padding is 0
   const matPad = new cv.Mat(); // new mat for padded image
-  cv.copyMakeBorder(matC3, matPad, 0, yPad, 0, xPad, cv.BORDER_CONSTANT); // padding black
-
+  cv.copyMakeBorder(
+    matC3,
+    matPad,
+    yPad / 2,
+    yPad / 2,
+    xPad / 2,
+    xPad / 2,
+    cv.BORDER_CONSTANT
+  ); // padding black
+  console.log("target size (w, h):", matPad.cols, matPad.rows);
   const input = cv.blobFromImage(
     matPad,
     1 / 255.0, // normalize
@@ -47,12 +59,11 @@ const preprocessing = async (
   //   "preprocessing:",
   //   `mat size ${mat.rows}x${mat.cols}, model size ${modelWidth}x${modelHeight}, maxSize ${maxSize}x${maxSize}, xPad ${xPad}, yPad ${yPad}, xRatio ${xRatio}, yRatio ${yRatio}`
   // );
-
   // release mat opencv
   mat.delete();
   matC3.delete();
   matPad.delete();
-  return [input, xRatio, yRatio];
+  return [input, ratio, xPad, yPad];
 };
 
 /**
@@ -74,12 +85,11 @@ export const detectImage = async (
   scoreThreshold: number = 0.2
 ) => {
   const [modelWidth, modelHeight] = modelInputShape.slice(2);
-  const [input, xRatio, yRatio] = await preprocessing(
+  const [input, ratio, xPad, yPad] = await preprocessing(
     image,
     modelWidth,
     modelHeight
   );
-
   const tensor = new ort.Tensor("float32", input.data32F, modelInputShape); // to ort.Tensor
   const config = new ort.Tensor(
     "float32",
@@ -104,11 +114,12 @@ export const detectImage = async (
     const score = Math.max(...scores); // maximum probability scores
     const label = scores.indexOf(score); // class id of maximum probability scores
 
+    // fix bounding box to original image size, removing padding
     const [x, y, w, h] = [
-      (box[0] - 0.5 * box[2]) * xRatio, // upscale left
-      (box[1] - 0.5 * box[3]) * yRatio, // upscale top
-      box[2] * xRatio, // upscale width
-      box[3] * yRatio, // upscale height
+      box[0] * ratio - xPad / 2, // upscale left
+      box[1] * ratio - yPad / 2, // upscale top
+      box[2] * ratio, // upscale width
+      box[3] * ratio, // upscale height
     ]; // keep boxes in maxSize range
     boxes.push({
       labelIndex: label,
@@ -140,23 +151,22 @@ export const renderBoxes = (
   ctx.textBaseline = "top";
 
   boxes.forEach((box) => {
-    const klass = labels[box.labelIndex];
+    const klass = defaultLabelsJaLabelMap[labels[box.labelIndex]];
     const score = (box.probability * 100).toFixed(1);
     const [x1, y1, width, height] = box.bounding;
-
     // draw box.
-    ctx.fillStyle = "rgba(0, 0, 0, 0.1)";
+    ctx.fillStyle = getColorStr(labels[box.labelIndex], 0.2);
     ctx.fillRect(x1, y1, width, height);
     // draw border box
-    ctx.strokeStyle = "rgba(0, 0, 0, 0.3)";
+    ctx.strokeStyle = getColorStr(labels[box.labelIndex], 0.9);
     ctx.lineWidth = Math.max(
       Math.min(ctx.canvas.width, ctx.canvas.height) / 200,
-      2.5
+      2.0
     );
     ctx.strokeRect(x1, y1, width, height);
-
     // draw the label background.
-    ctx.fillStyle = "rgba(255, 255, 255, 0.7)";
+    ctx.fillStyle = getColorStr(labels[box.labelIndex], 0.9);
+    // label box
     const textWidth = ctx.measureText(klass + " - " + score + "%").width;
     const textHeight = parseInt(font, 10); // base 10
     const yText = y1 - (textHeight + ctx.lineWidth);
@@ -166,9 +176,8 @@ export const renderBoxes = (
       textWidth + ctx.lineWidth,
       textHeight + ctx.lineWidth
     );
-
     // Draw labels
-    ctx.fillStyle = "#000000";
+    ctx.fillStyle = "#FFFFFF";
     ctx.fillText(
       klass + " - " + score + "%",
       x1 - 1,
