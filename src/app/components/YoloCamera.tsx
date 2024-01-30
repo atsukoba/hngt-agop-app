@@ -6,9 +6,8 @@ import {
 } from "@/yolo/image_processing";
 import { useEffect, useRef, useState } from "react";
 
-import * as ort from "onnxruntime-web";
-import { InferenceSessionSet } from "@/utils/types";
-import { useAtom, useAtomValue, useSetAtom } from "jotai/react";
+import { LoadingMessages } from "@/utils/consts";
+import { isSameInferenceBoxes } from "@/utils/data";
 import {
   currentBoxesAtom,
   currentCameraAtom,
@@ -27,8 +26,10 @@ import {
   scoreThreshold,
   topK,
 } from "@/utils/states";
-import { LoadingMessages } from "@/utils/consts";
-import { isSameInferenceBoxes } from "@/utils/data";
+import { InferenceSessionSet } from "@/utils/types";
+import { useAtom, useAtomValue, useSetAtom } from "jotai/react";
+import Script from "next/script";
+import * as ort from "onnxruntime-web";
 
 const wait = async (ms: number) => {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -108,7 +109,7 @@ export default function YoloCamera({
     /**
      * @description init ort session
      */
-    
+
     initOrtSession();
   }, []);
 
@@ -231,7 +232,13 @@ export default function YoloCamera({
         });
       }
     })();
-  }, [resultBoxes, cameraOn]);
+  }, [
+    resultBoxes,
+    cameraOn,
+    session,
+    cameraCanvasRef.current,
+    videoRef.current,
+  ]);
 
   useEffect(() => {
     /**
@@ -298,25 +305,34 @@ export default function YoloCamera({
     }, [cameraCanvasRef.current, currentIntervalTIme, describeIntervalSec]);
 
   return (
-    <div className="w-full h-full relative" ref={containerRef}>
-      <video
-        className="w-full h-full left-0 top-0 absolute"
-        ref={videoRef}
-      ></video>
-      <canvas
-        className="canvas__camera_input"
-        ref={cameraCanvasRef}
-        style={{ boxSizing: "border-box", display: "none" }}
-        width={elementWidth}
-        height={elementHeight}
+    <>
+      <Script
+        src="https://docs.opencv.org/4.5.5/opencv.js"
+        strategy="beforeInteractive"
+        onLoad={() => {
+          console.log("OpenCV loaded");
+        }}
       />
-      <canvas
-        className="canvas__bounding_box left-0 top-0 absolute"
-        ref={boxCanvasRef}
-        style={{ boxSizing: "border-box" }}
-        width={elementWidth}
-        height={elementHeight}
-      />
-    </div>
+      <div className="w-full h-full relative" ref={containerRef}>
+        <video
+          className="w-full h-full left-0 top-0 absolute"
+          ref={videoRef}
+        ></video>
+        <canvas
+          className="canvas__camera_input"
+          ref={cameraCanvasRef}
+          style={{ boxSizing: "border-box", display: "none" }}
+          width={elementWidth}
+          height={elementHeight}
+        />
+        <canvas
+          className="canvas__bounding_box left-0 top-0 absolute"
+          ref={boxCanvasRef}
+          style={{ boxSizing: "border-box" }}
+          width={elementWidth}
+          height={elementHeight}
+        />
+      </div>
+    </>
   );
 }

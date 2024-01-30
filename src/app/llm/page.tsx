@@ -1,12 +1,8 @@
-import { useSearchParams } from "next/navigation";
 import AppFooter from "../components/AppFooter";
 import DetectStatus from "../components/DetectStatus";
 import LMDisplay from "../components/LMDisplay";
 import Loading from "../components/Loading";
 import YoloCamera from "../components/YoloCamera";
-import { useEffect, useState } from "react";
-import { useSetAtom } from "jotai";
-import { apiKeyAtom } from "@/utils/states";
 
 export default function App() {
   return (

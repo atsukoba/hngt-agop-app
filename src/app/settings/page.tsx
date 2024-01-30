@@ -14,6 +14,8 @@ import {
   modelNameAtom,
   scoreThreshold,
   topK,
+  voiceAtom,
+  voiceIndexAtom,
   voicePitchAtom,
   voiceSpeedAtom,
 } from "@/utils/states";
@@ -332,6 +334,7 @@ const SpeechTest = () => {
   const [text, setText] = useState(
     "あのイーハトーヴォのすきとおった風、夏でも底に冷たさをもつ青いそら、うつくしい森で飾られたモリーオ市、郊外のぎらぎらひかる草の波。"
   );
+  const voice = useAtomValue(voiceAtom);
   const voicePitch = useAtomValue(voicePitchAtom);
   const voiceSpeed = useAtomValue(voiceSpeedAtom);
 
@@ -339,6 +342,7 @@ const SpeechTest = () => {
     if (typeof window !== "undefined" && "speechSynthesis" in window) {
       setIsPlaying(true);
       const uttr = new SpeechSynthesisUtterance();
+      if (voice) uttr.voice = voice;
       uttr.lang = "ja-JP";
       uttr.pitch = voicePitch;
       uttr.volume = 1.0;
@@ -400,8 +404,10 @@ export default function SettingPage() {
 
   const [currentTab, setCurrentTab] = useState(0);
 
+  const [voice, setVoice] = useAtom(voiceAtom);
   const [voicePitch, setvoicePitch] = useAtom(voicePitchAtom);
   const [voiceSpeed, setvoiceSpeed] = useAtom(voiceSpeedAtom);
+  const [voiceIndex, setVoiceIndex] = useAtom(voiceIndexAtom);
 
   const [systemPrompt, setSystemPrompt] = useAtom(llmSystemPromptAtom);
 
@@ -489,14 +495,43 @@ export default function SettingPage() {
         <h3 className="font-bold text-xl mb-4">Voice Settings / 声の設定</h3>
         <div className="mb-8 grid md:grid-cols-3 gap-2">
           <h3 className="font-bold text-md mb-8 col-span-1">
+            {InfoIcon("自動音声の声の高さの設定です / Voice Pitch")}声 / Voice
+          </h3>
+          <select
+            className="select select-primary w-full max-w-xs"
+            value={voiceIndex}
+            onChange={(e) => {
+              const idx = e.target.value as any as number;
+              setVoiceIndex(idx);
+              setVoice(
+                window.speechSynthesis
+                  .getVoices()
+                  .filter((v) => v.lang === "ja-JP")[idx]
+              );
+            }}
+          >
+            {window.speechSynthesis
+              .getVoices()
+              .filter((v) => v.lang === "ja-JP")
+              .map((v, idx) => {
+                return (
+                  <option key={idx} value={idx}>
+                    {v.name} {v.default && "(default)"}
+                  </option>
+                );
+              })}
+          </select>
+        </div>
+        <div className="mb-8 grid md:grid-cols-3 gap-2">
+          <h3 className="font-bold text-md mb-8 col-span-1">
             {InfoIcon("自動音声の声の高さの設定です / Voice Pitch")}
             声の高さ / Voice Pitch: {voicePitch}
           </h3>
           <input
             type="range"
-            min={0.25}
-            max={2.5}
-            step={0.1}
+            min={0.1}
+            max={3}
+            step={0.05}
             value={voicePitch}
             onChange={(e) => setvoicePitch(Number(e.target.value))}
             className="range range-primary col-span-3 md:col-span-2"
@@ -509,9 +544,9 @@ export default function SettingPage() {
           </h3>
           <input
             type="range"
-            min={0.25}
-            max={2.5}
-            step={0.1}
+            min={0.1}
+            max={3}
+            step={0.05}
             value={voiceSpeed}
             onChange={(e) => setvoiceSpeed(Number(e.target.value))}
             className="range range-primary col-span-3 md:col-span-2"
