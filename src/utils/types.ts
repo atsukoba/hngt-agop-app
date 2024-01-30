@@ -6,6 +6,13 @@ declare global {
   }
 }
 
+/**
+ * InferenceBox
+ * @typedef {Object} InferenceBox
+ * @property {number} labelIndex predicted label index
+ * @property {number} probability probability of the predicted label
+ * @property {[number, number, number, number]} bounding bounding box [x, y, w, h]
+ */
 export type InferenceBox = {
   labelIndex: number;
   probability: number;
