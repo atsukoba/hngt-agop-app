@@ -84,6 +84,9 @@ export const discordWebhookUrlAtom = atomWithStorage<string>(
   ""
 );
 
+// speech synthesis
+export const voiceAtom = atom<SpeechSynthesisVoice | undefined>(undefined);
+export const voiceIndexAtom = atomWithStorage<number>("agop_voiceIndexAtom", 0);
 export const voicePitchAtom = atomWithStorage<number>(
   "agop_voicePitchAtom",
   1.0

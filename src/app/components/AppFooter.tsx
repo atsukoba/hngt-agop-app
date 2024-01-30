@@ -33,7 +33,7 @@ export default function AppFooter({
   const [loadingMessage, setLoadingMessage] = useAtom(loadingMessageAtom);
 
   const cameras = useAtomValue(currentCamerasAtom);
-  const setCamera = useSetAtom(currentCameraAtom);
+  const [currentCamera, setCamera] = useAtom(currentCameraAtom);
   const setCameraOn = useSetAtom(isCameraOn);
 
   const token = useAtomValue(apiKeyAtom);
@@ -114,6 +114,7 @@ export default function AppFooter({
         </button>
         <select
           className="select select-accent w-full max-w-sm"
+          value={currentCamera ? cameras.indexOf(currentCamera) : 0}
           onChange={(e) =>
             setCamera(cameras[e.target.value as unknown as number])
           }

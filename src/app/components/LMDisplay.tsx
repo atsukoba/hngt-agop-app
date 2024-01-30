@@ -2,36 +2,12 @@
 
 import {
   llmResponseAtom,
+  voiceAtom,
   voicePitchAtom,
   voiceSpeedAtom,
 } from "@/utils/states";
 import { useAtomValue } from "jotai/react";
-import { useEffect, useState } from "react";
-
-const readAloud = (
-  text: string,
-  voicePitch: number,
-  voiceSpeed: number,
-  onend?: (e: SpeechSynthesisEvent) => void,
-  onerror?: (e: SpeechSynthesisErrorEvent) => void
-) => {
-  if (typeof window !== "undefined" && "speechSynthesis" in window) {
-    const uttr = new SpeechSynthesisUtterance();
-    uttr.lang = "ja-JP";
-    uttr.pitch = voicePitch;
-    uttr.volume = voiceSpeed;
-    uttr.text = text;
-    if (onend) uttr.addEventListener("end", onend);
-    if (onerror) uttr.addEventListener("error", onerror);
-    window.speechSynthesis.speak(uttr);
-  }
-};
-
-const speakStop = () => {
-  if (typeof window !== "undefined" && "speechSynthesis" in window) {
-    window.speechSynthesis.cancel();
-  }
-};
+import { useCallback, useEffect, useState } from "react";
 
 /**
  *
@@ -94,6 +70,7 @@ export default function LMDisplay({
   rightMargin?: number;
 }) {
   const llmResponse = useAtomValue(llmResponseAtom);
+  const voice = useAtomValue(voiceAtom);
   const voicePitch = useAtomValue(voicePitchAtom);
   const voiceSpeed = useAtomValue(voiceSpeedAtom);
 
@@ -101,6 +78,36 @@ export default function LMDisplay({
   const [internalResposes, setInternalResposes] = useState<string[]>([]);
 
   const separateString = "\n";
+
+  const readAloud = useCallback(
+    (
+      text: string,
+      voicePitch: number,
+      voiceSpeed: number,
+      voice?: SpeechSynthesisVoice,
+      onend?: (e: SpeechSynthesisEvent) => void,
+      onerror?: (e: SpeechSynthesisErrorEvent) => void
+    ) => {
+      if (typeof window !== "undefined" && "speechSynthesis" in window) {
+        const uttr = new SpeechSynthesisUtterance();
+        if (voice) uttr.voice = voice;
+        uttr.lang = "ja-JP";
+        uttr.pitch = voicePitch;
+        uttr.volume = voiceSpeed;
+        uttr.text = text;
+        if (onend) uttr.addEventListener("end", onend);
+        if (onerror) uttr.addEventListener("error", onerror);
+        window.speechSynthesis.speak(uttr);
+      }
+    },
+    []
+  );
+
+  const speakStop = useCallback(() => {
+    if (typeof window !== "undefined" && "speechSynthesis" in window) {
+      window.speechSynthesis.cancel();
+    }
+  }, []);
 
   useEffect(() => {
     speakStop();
@@ -121,6 +128,7 @@ export default function LMDisplay({
       text,
       voicePitch,
       voiceSpeed,
+      voice,
       (e) => {
         if (currentReadingIdx < internalResposes.length - 1) {
           setCurrentReadingIdx(currentReadingIdx + 1);
