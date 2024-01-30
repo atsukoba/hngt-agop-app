@@ -543,7 +543,7 @@ export default function SettingPage() {
         <h3 className="font-bold text-xl mb-4">System Prompt</h3>
         <div className="mb-8">
           <p className="mb-8">
-            表示システムの制御のためのプロンプトです。設定したプロンプトの後ろに追記されて送信されます。
+            表示システムの制御のためのプロンプトです。設定したプロンプトに追記されて送信されます。
           </p>
           <input
             type="url"

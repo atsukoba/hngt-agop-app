@@ -9,7 +9,7 @@ import {
 import { InferenceBox } from "@/utils/types";
 import { labels } from "@/yolo/label";
 import { useAtomValue, useSetAtom } from "jotai/react";
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 
 export default function DetectStatus({
   width = 200,
@@ -25,11 +25,14 @@ export default function DetectStatus({
   // history results
   const anchorRef = useRef<HTMLDivElement>(null);
 
-  const issueNewPrompt = (boxes: InferenceBox[]) => {
-    const inputLabels = boxes.map((box) => jaLabel[labels[box.labelIndex]]);
-    const prompt = buildRandomPrompts(inputLabels);
-    setPromptDialogMessage(prompt);
-  };
+  const issueNewPrompt = useCallback(
+    (boxes: InferenceBox[]) => {
+      const inputLabels = boxes.map((box) => jaLabel[labels[box.labelIndex]]);
+      const prompt = buildRandomPrompts(inputLabels);
+      setPromptDialogMessage(prompt);
+    },
+    [setPromptDialogMessage]
+  );
 
   useEffect(() => {
     if (resultBoxesHistory.length) {

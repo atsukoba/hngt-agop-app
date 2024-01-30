@@ -55,7 +55,7 @@ const LmResponseWrap = ({
       const currentJa = responseJa.slice(0, cnt);
       const currentEn = responseEn?.slice(0, cnt);
       setCurrentResponseJa(currentJa);
-      responseEn && setCurrentResponseEn(responseEn.slice(0, cnt));
+      currentEn && setCurrentResponseEn(currentEn);
       cnt === longerLim && clearInterval(runner);
       cnt++;
     }, 15);
@@ -111,8 +111,8 @@ export default function LMDisplay({
     const res = internalResposes[currentReadingIdx];
     if (!res) return;
     let text: string;
-    if (res.indexOf("[lang]") !== -1) {
-      text = res.split("[lang]")[0];
+    if (res.indexOf("[en]") !== -1) {
+      text = res.split("[en]")[0];
     } else {
       text = res;
     }
@@ -140,12 +140,8 @@ export default function LMDisplay({
       }}
     >
       <LmResponseWrap
-        responseJa={
-          internalResposes[currentReadingIdx]?.split("[lang]")[0] || ""
-        }
-        responseEn={
-          internalResposes[currentReadingIdx]?.split("[lang]")[1] || ""
-        }
+        responseJa={internalResposes[currentReadingIdx]?.split("[en]")[0] || ""}
+        responseEn={internalResposes[currentReadingIdx]?.split("[en]")[1] || ""}
       />
     </section>
   );

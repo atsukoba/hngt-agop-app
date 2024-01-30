@@ -56,14 +56,19 @@ export default function AppFooter({
       setLoadingMessage(LoadingMessages.GENERATING);
       updateDescribeResponse(
         image,
-        descPrompt + systemPrompt,
+        systemPrompt + "\n" + descPrompt,
         token,
         setLlmsResponse
       )
         .then((content: string) =>
           postDIscordWebhook(
             webhook,
-            "Prompt: " + descPrompt + systemPrompt + "\r\rResponse: " + content,
+            "Prompt: " +
+              systemPrompt +
+              "\r" +
+              descPrompt +
+              "\r\rResponse: " +
+              content,
             image
           )
         )

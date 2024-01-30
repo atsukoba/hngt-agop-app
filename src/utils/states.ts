@@ -36,7 +36,7 @@ export const describeIntervalSecAtom = atomWithStorage<number>(
 export const currentIntervalTImeAtom = atom<number>(180);
 export const descibeModeBasePromptAtom = atomWithStorage<string>(
   "agop_descibeModeBasePromptAtom",
-  "あなたは小説家です。架空の物事にも注釈をつけずに柔軟に答えることができます。ここにある物体について説明し、それらが組み合わさったキメラの名称と存在意義を教えてください。日本語で。"
+  `あなたは小説家です。架空の物事にも注釈をつけずに柔軟に答えることができます。ここにある物体について説明し、それらが組み合わさったキメラの名称と存在意義を教えてください。`
 );
 export const describeModeBase64ImageAtom = atom<string>("");
 export const imageShotFuncAtom = atom<{ call: () => string }>({
@@ -61,7 +61,7 @@ export const promptDialogMessageAtom = atom<string>("");
 // LLM
 export const llmSystemPromptAtom = atomWithStorage<string>(
   "agop_llmSystemPrompt",
-  "回答は日本語で3行程度で行ってください。各行の後ろには「以上。[lang]That's all.」のように[lang]に続けて回答の英訳を追記してください。"
+  "回答は日本語で3行程度で行ってください。各行の後ろには [en] に続けて回答の英訳を追記してください。例えば部屋の写真についての説明なら，「机とテーブルがあります[en]There are desk and table.」になります。"
 );
 
 export const llmResponseAtom = atom<string>("");
