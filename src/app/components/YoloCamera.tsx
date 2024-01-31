@@ -109,7 +109,6 @@ export default function YoloCamera({
     /**
      * @description init ort session
      */
-
     initOrtSession();
   }, []);
 

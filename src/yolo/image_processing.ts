@@ -26,14 +26,14 @@ const preprocessing = async (
   cv.cvtColor(mat, matC3, cv.COLOR_RGBA2BGR); // RGBA to BGR
 
   // padding image to [n x n] dim
-  console.log("model size (w, h):", modelWidth, modelHeight);
+  // console.log("model size (w, h):", modelWidth, modelHeight);
   const maxSize = Math.max(matC3.rows, matC3.cols); // get max size from width and height
-  console.log("input size (w, h):", matC3.cols, matC3.rows);
+  // console.log("input size (w, h):", matC3.cols, matC3.rows);
   const ratio = maxSize / Math.min(modelHeight, modelWidth);
-  console.log("ratio:", ratio);
+  // console.log("ratio:", ratio);
   const xPad = modelWidth * ratio - matC3.cols; // set xPadding
   const yPad = modelHeight * ratio - matC3.rows; // set yPadding
-  console.log("pad:", xPad, yPad);
+  // console.log("pad:", xPad, yPad);
   // eather x or y padding is 0
   const matPad = new cv.Mat(); // new mat for padded image
   cv.copyMakeBorder(
@@ -45,7 +45,7 @@ const preprocessing = async (
     xPad / 2,
     cv.BORDER_CONSTANT
   ); // padding black
-  console.log("target size (w, h):", matPad.cols, matPad.rows);
+  // console.log("target size (w, h):", matPad.cols, matPad.rows);
   const input = cv.blobFromImage(
     matPad,
     1 / 255.0, // normalize
@@ -153,7 +153,9 @@ export const renderBoxes = (
   boxes.forEach((box) => {
     const klass = defaultLabelsJaLabelMap[labels[box.labelIndex]];
     const score = (box.probability * 100).toFixed(1);
-    const [x1, y1, width, height] = box.bounding;
+    const [xCenter, yCenter, width, height] = box.bounding;
+    const x1 = xCenter - width / 2;
+    const y1 = yCenter - height / 2;
     // draw box.
     ctx.fillStyle = getColorStr(labels[box.labelIndex], 0.2);
     ctx.fillRect(x1, y1, width, height);
