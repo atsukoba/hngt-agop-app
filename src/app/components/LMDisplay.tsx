@@ -86,17 +86,33 @@ export default function LMDisplay({
       voiceSpeed: number,
       voice?: SpeechSynthesisVoice,
       onend?: (e: SpeechSynthesisEvent) => void,
-      onerror?: (e: SpeechSynthesisErrorEvent) => void
+      onerror?: (e: SpeechSynthesisErrorEvent) => void,
+      maxSpeechTime: number = 30000
     ) => {
       if (typeof window !== "undefined" && "speechSynthesis" in window) {
-        const uttr = new SpeechSynthesisUtterance();
+        let maxSpeechTimeOut: NodeJS.Timeout;
+        const uttr = new SpeechSynthesisUtterance(text);
         if (voice) uttr.voice = voice;
         uttr.lang = "ja-JP";
         uttr.pitch = voicePitch;
         uttr.volume = voiceSpeed;
-        uttr.text = text;
-        if (onend) uttr.addEventListener("end", onend);
-        if (onerror) uttr.addEventListener("error", onerror);
+        uttr.onstart = (e) => {
+          maxSpeechTimeOut = setTimeout(() => {
+            window.speechSynthesis.cancel();
+          }, maxSpeechTime);
+        };
+        uttr.onend = (e) => {
+          clearTimeout(maxSpeechTimeOut);
+          if (onend) {
+            onend(e);
+          }
+        };
+        uttr.onerror = (e) => {
+          clearTimeout(maxSpeechTimeOut);
+          if (onerror) {
+            onerror(e);
+          }
+        };
         window.speechSynthesis.speak(uttr);
       }
     },
@@ -110,6 +126,7 @@ export default function LMDisplay({
   }, []);
 
   useEffect(() => {
+    window.addEventListener("beforeunload", () => speechSynthesis.cancel());
     speakStop();
     setInternalResposes(llmResponse.split(separateString));
   }, [llmResponse]);
@@ -136,6 +153,9 @@ export default function LMDisplay({
       },
       (e) => {
         console.log("speech synthesis error: ", e);
+        if (currentReadingIdx < internalResposes.length - 1) {
+          setCurrentReadingIdx(currentReadingIdx + 1);
+        }
       }
     );
   }, [internalResposes, currentReadingIdx, voicePitch, voiceSpeed]);
