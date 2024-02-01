@@ -8,7 +8,7 @@
  * @param base64Image
  * @returns
  */
-export const postDIscordWebhook = async (
+export const postDiscordWebhook = async (
   webhookUrl: string,
   message: string,
   base64Image: string | undefined = undefined

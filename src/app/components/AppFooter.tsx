@@ -1,9 +1,10 @@
 "use client";
 
 import PromptDisplay from "@/app/components/PromptDisplay";
+import { buildPreviousResponseAsPrompt } from "@/prompts/builder";
 import { updateDescribeResponse } from "@/utils/api";
 import { LoadingMessages } from "@/utils/consts";
-import { postDIscordWebhook } from "@/utils/logging";
+import { postDiscordWebhook } from "@/utils/logging";
 import {
   apiKeyAtom,
   currentCameraAtom,
@@ -17,13 +18,15 @@ import {
   imageShotFuncAtom,
   isAutoDescribeOnAtom,
   isCameraOn,
+  llmPreviousResponseAtom,
   llmResponseAtom,
   llmSystemPromptAtom,
   loadingMessageAtom,
 } from "@/utils/states";
 import { useAtom, useAtomValue, useSetAtom } from "jotai/react";
+import { useAtomCallback } from "jotai/utils";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useCallback, useEffect } from "react";
 
 export default function AppFooter({
   gpt4mode = false,
@@ -41,14 +44,41 @@ export default function AppFooter({
   const imageShotFunc = useAtomValue(imageShotFuncAtom);
   const [image, setImage] = useAtom(describeModeBase64ImageAtom);
   const [isAutoDescribeOn, setIsAutoDescribeOn] = useAtom(isAutoDescribeOnAtom);
-  const currentIntervalTIme = useAtomValue(currentIntervalTImeAtom);
+  const [currentIntervalTIme, setCurrentIntervalTIme] = useAtom(
+    currentIntervalTImeAtom
+  );
   const descIntervalTime = useAtomValue(describeIntervalSecAtom);
   const describeMaxToken = useAtomValue(describeMaxTokenAtom);
   const descPrompts = useAtomValue(descibeModeBasePromptsAtom);
   const systemPrompt = useAtomValue(llmSystemPromptAtom);
   const webhook = useAtomValue(discordWebhookUrlAtom);
 
-  const setLlmsResponse = useSetAtom(llmResponseAtom);
+  const [llmResponse, setLlmsResponse] = useAtom(llmResponseAtom);
+  const setLlmsPreviousResponse = useSetAtom(llmPreviousResponseAtom);
+
+  const updateDescribeResponseCallback = useCallback(
+    (text: string) => {
+      console.log(llmResponse);
+      setLlmsPreviousResponse(llmResponse);
+      console.log(text);
+      setLlmsResponse(text);
+    },
+    [llmResponse]
+  );
+
+  const getPreviousResponseAsPrompt = useAtomCallback(
+    useCallback((get) => {
+      const res = get(llmPreviousResponseAtom);
+      return buildPreviousResponseAsPrompt(res);
+    }, [])
+  );
+
+  useEffect(() => {
+    // after interval time value is changed, update current time
+    if (currentIntervalTIme >= descIntervalTime && isAutoDescribeOn) {
+      setCurrentIntervalTIme(descIntervalTime);
+    }
+  });
 
   useEffect(() => {
     /**
@@ -59,22 +89,23 @@ export default function AppFooter({
       // randomly select a prompt
       const descPrompt =
         descPrompts[Math.floor(Math.random() * descPrompts.length)];
+      // trigger generation
+      const promptSend = [
+        systemPrompt,
+        descPrompt,
+        getPreviousResponseAsPrompt(),
+      ].join("\n");
       updateDescribeResponse(
         image,
-        systemPrompt + "\n" + descPrompt,
+        promptSend,
         token,
         describeMaxToken,
-        setLlmsResponse
+        updateDescribeResponseCallback
       )
         .then((content: string) =>
-          postDIscordWebhook(
+          postDiscordWebhook(
             webhook,
-            "Prompt: " +
-              systemPrompt +
-              "\r" +
-              descPrompt +
-              "\r\rResponse: " +
-              content,
+            "[Prompt]\r" + promptSend + "\r\r[Response]\r" + content,
             image
           )
         )

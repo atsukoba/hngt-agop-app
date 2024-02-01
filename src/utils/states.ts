@@ -37,14 +37,14 @@ export const describeMaxTokenAtom = atomWithStorage<number>(
   "agop_describeMaxTokenAtom",
   512
 );
-export const currentIntervalTImeAtom = atom<number>(180);
+export const currentIntervalTImeAtom = atom<number>(120);
 export const descibeModeBasePromptsAtom = atomWithStorage<string[]>(
   "agop_descibeModeBasePromptsAtom",
   [
     "あなたは小説家です。架空の物事にも注釈をつけずに柔軟に答えることができます。ここにある物体について説明し、それらが組み合わさったキメラの名称と存在意義を教えてください。",
     "あなたは芸術作品を解説する立場です。架空の物事にも注釈をつけずに柔軟に表現することができます。ここにある物体について説明し、状況を記述してください。例えば，それらが組み合わさったキメラの名称と存在意義や，それらの物体や肉体が置かれた「庭」としてどのような状態になっているかなどを教えてください。なるべく詳細な解説をお願いします。",
     "あなたの視界に映る物体の位置関係などの状況を詳細に，かつ簡潔に解説してください。なにかわからない物体に対しては，想像や比喩を用いてください。",
-    "あなたが庭園において物体を配置する役割を持っているとします。あなたの視界にある物体同士の配置や関係性について詳細に解説し，なるべくフラットな感想を述べてください。",
+    "あなたが庭園において物体を配置する役割を持っているとします。あなたの視界にある物体同士の配置や関係性について詳細に解説し，なるべくフラットな感想を述べてください。庭園について話すのが難しい場合は、空想や想像でよいので写っている物体を庭園に置く場合どうするかについて話してください。",
   ]
 );
 
@@ -75,9 +75,10 @@ export const llmSystemPromptAtom = atomWithStorage<string>(
 );
 
 export const llmResponseAtom = atom<string>("");
-export const llmResponseHistoryAtom = atomWithStorage<string[]>(
-  "agop_llmResponseHistoryAtom",
-  []
+export const llmPreviousResponseAtom = atom<string>("");
+export const usePreviousResponseAtom = atomWithStorage<boolean>(
+  "agop_usePreviousResponseAtom",
+  false
 );
 
 // OpenAI API
