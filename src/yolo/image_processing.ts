@@ -1,7 +1,7 @@
 "use client";
 
 import * as ort from "onnxruntime-web";
-import { labels, defaultLabelsJaLabelMap, getColorStr } from "@/yolo/label";
+import { labels, getColorStr } from "@/yolo/label";
 import { InferenceBox, InferenceSessionSet } from "@/utils/types";
 
 export const convertToBase64 = (source: HTMLCanvasElement) => {
@@ -151,7 +151,7 @@ export const renderBoxes = (
   ctx.textBaseline = "top";
 
   boxes.forEach((box) => {
-    const klass = defaultLabelsJaLabelMap[labels[box.labelIndex]];
+    const klass = labels[box.labelIndex];
     const score = (box.probability * 100).toFixed(1);
     const [xCenter, yCenter, width, height] = box.bounding;
     const x1 = xCenter - width / 2;
@@ -162,7 +162,7 @@ export const renderBoxes = (
     // draw border box
     ctx.strokeStyle = getColorStr(labels[box.labelIndex], 0.9);
     ctx.lineWidth = Math.max(
-      Math.min(ctx.canvas.width, ctx.canvas.height) / 200,
+      Math.min(ctx.canvas.width, ctx.canvas.height) / 250,
       2.0
     );
     ctx.strokeRect(x1, y1, width, height);
