@@ -3,8 +3,9 @@
 import { validateObjectTemplate } from "@/prompts/templates";
 import {
   apiKeyAtom,
-  descibeModeBasePromptAtom,
+  descibeModeBasePromptsAtom,
   describeIntervalSecAtom,
+  describeMaxTokenAtom,
   discordWebhookUrlAtom,
   inferenceIntervalAtom,
   iouThreshold,
@@ -275,23 +276,72 @@ const YoloModeSettings = () => {
 };
 
 const GPT4ImageCaptioningModeSettings = () => {
-  const [prompt, setPrompt] = useAtom(descibeModeBasePromptAtom);
+  const [prompts, setPrompts] = useAtom(descibeModeBasePromptsAtom);
   const [descInterval, setDescInterval] = useAtom(describeIntervalSecAtom);
+  const [maxToken, setMaxToken] = useAtom(describeMaxTokenAtom);
 
   return (
     <div className="min-h-screen">
+      <h2 className="font-bold text-2xl mb-8">Language Model Settings</h2>
+      <div className="mb-8">
+        <div className="mb-8 grid md:grid-cols-3 gap-2">
+          <h3 className="font-bold text-md mb-8 col-span-1">
+            {InfoIcon(
+              "Interval betwenn each inference / 生成後に次の推論を行うまでの秒数 "
+            )}
+            Generation Interval (sec): {descInterval}
+          </h3>
+          <input
+            type="range"
+            min={30}
+            max={300}
+            step={5}
+            value={descInterval}
+            onChange={(e) => setDescInterval(Number(e.target.value))}
+            className="range range-primary col-span-3 md:col-span-2"
+          />
+        </div>
+        <div className="mb-8 grid md:grid-cols-3 gap-2">
+          <h3 className="font-bold text-md mb-8 col-span-1">
+            {InfoIcon("Upper limit of n tokens / 生成の最大トークン数 ")}
+            max n of tokens: {maxToken}
+          </h3>
+          <input
+            type="range"
+            min={128}
+            max={2048}
+            step={2}
+            value={maxToken}
+            onChange={(e) => setMaxToken(Number(e.target.value))}
+            className="range range-primary col-span-3 md:col-span-2"
+          />
+        </div>
+      </div>
       <h2 className="font-bold text-2xl mb-8">Prompt</h2>
       <div className="mb-8">
         <h3 className="font-bold text-md mb-4">
           {InfoIcon("OpenAI secret token")}
           Prompt / 画像キャプション生成のためのプロンプト
         </h3>
-        <textarea
-          className={`textarea textarea-lg textarea-primary w-full`}
-          value={prompt}
-          placeholder="input prompt here / プロンプトを入力してください"
-          onChange={(e) => setPrompt(e.target.value)}
-        ></textarea>
+        <p className="mb-8">
+          ランダムに一つのプロンプトが選択されて、画像説明の生成を行います。
+        </p>
+        {prompts.map((prompt, idx) => (
+          <>
+            <p className="text-sm mb-4">Prompt {idx + 1}</p>
+            <textarea
+              className={`textarea textarea-lg textarea-bordered w-full mb-8`}
+              value={prompt}
+              key={idx}
+              placeholder="input prompt here / プロンプトを入力してください"
+              onChange={(e) => {
+                const newPrompts = [...prompts];
+                newPrompts[idx] = e.target.value;
+                setPrompts(newPrompts);
+              }}
+            ></textarea>
+          </>
+        ))}
       </div>
       {/* <div className="mb-8">
         <h3 className="font-bold text-md mb-4">
@@ -306,25 +356,6 @@ const GPT4ImageCaptioningModeSettings = () => {
           onChange={(e) => setRole(e.target.value)}
         />
       </div> */}
-      <div className="mb-8">
-        <div className="mb-8 grid md:grid-cols-3 gap-2">
-          <h3 className="font-bold text-md mb-8 col-span-1">
-            {InfoIcon(
-              "Interval betwenn each inference / 生成後に次の推論を行うまでの秒数 "
-            )}
-            Inference Interval (sec): {descInterval}
-          </h3>
-          <input
-            type="range"
-            min={30}
-            max={300}
-            step={5}
-            value={descInterval}
-            onChange={(e) => setDescInterval(Number(e.target.value))}
-            className="range range-primary col-span-3 md:col-span-2"
-          />
-        </div>
-      </div>
     </div>
   );
 };

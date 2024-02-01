@@ -1,10 +1,9 @@
 import OpenAI from "openai";
-import { OpenAIStream, StreamingTextResponse } from "ai";
 
 export const runtime = "edge";
 
 export async function POST(req: Request) {
-  const { prompt, base64Image } = await req.json();
+  const { prompt, base64Image, maxToken } = await req.json();
   // get Bearer token from the request
   const token = req.headers.get("authorization")?.split(" ")[1];
 
@@ -35,7 +34,7 @@ export async function POST(req: Request) {
           ],
         },
       ],
-      max_tokens: 512,
+      max_tokens: maxToken,
     })
     .asResponse();
   return response;

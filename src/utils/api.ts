@@ -49,11 +49,12 @@ export const updateChatResponse = async (
 const fetchDescription = async (
   base64Image: string,
   prompt: string,
-  token: string
+  token: string,
+  maxToken: number = 512
 ) => {
   return await fetch("/api/describe", {
     method: "POST",
-    body: JSON.stringify({ prompt, base64Image }),
+    body: JSON.stringify({ prompt, base64Image, maxToken }),
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -74,9 +75,10 @@ export const updateDescribeResponse = async (
   base64Image: string,
   prompt: string,
   token: string,
+  maxToken: number,
   updateCallback: any
 ) => {
-  const res = await fetchDescription(base64Image, prompt, token);
+  const res = await fetchDescription(base64Image, prompt, token, maxToken);
   const data = await res.json();
   // parse readable stream with server event
   console.log(data);

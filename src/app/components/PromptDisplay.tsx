@@ -1,11 +1,9 @@
 "use client";
 
-import { updateChatResponse, updateDescribeResponse } from "@/utils/api";
+import { updateChatResponse } from "@/utils/api";
 import { LoadingMessages } from "@/utils/consts";
 import {
   apiKeyAtom,
-  descibeModeBasePromptAtom,
-  describeModeBase64ImageAtom,
   llmResponseAtom,
   loadingMessageAtom,
   modelNameAtom,

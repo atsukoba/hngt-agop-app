@@ -9,8 +9,9 @@ import {
   currentCameraAtom,
   currentCamerasAtom,
   currentIntervalTImeAtom,
-  descibeModeBasePromptAtom,
+  descibeModeBasePromptsAtom,
   describeIntervalSecAtom,
+  describeMaxTokenAtom,
   describeModeBase64ImageAtom,
   discordWebhookUrlAtom,
   imageShotFuncAtom,
@@ -42,7 +43,8 @@ export default function AppFooter({
   const [isAutoDescribeOn, setIsAutoDescribeOn] = useAtom(isAutoDescribeOnAtom);
   const currentIntervalTIme = useAtomValue(currentIntervalTImeAtom);
   const descIntervalTime = useAtomValue(describeIntervalSecAtom);
-  const descPrompt = useAtomValue(descibeModeBasePromptAtom);
+  const describeMaxToken = useAtomValue(describeMaxTokenAtom);
+  const descPrompts = useAtomValue(descibeModeBasePromptsAtom);
   const systemPrompt = useAtomValue(llmSystemPromptAtom);
   const webhook = useAtomValue(discordWebhookUrlAtom);
 
@@ -54,10 +56,14 @@ export default function AppFooter({
      */
     if (image) {
       setLoadingMessage(LoadingMessages.GENERATING);
+      // randomly select a prompt
+      const descPrompt =
+        descPrompts[Math.floor(Math.random() * descPrompts.length)];
       updateDescribeResponse(
         image,
         systemPrompt + "\n" + descPrompt,
         token,
+        describeMaxToken,
         setLlmsResponse
       )
         .then((content: string) =>

@@ -31,13 +31,23 @@ export const labelsJaLabelMapAtom = atom<{ [key in Label]: string }>(
 // image description model (GPT-4) inference
 export const describeIntervalSecAtom = atomWithStorage<number>(
   "agop_describeInterval",
-  180
+  120
+);
+export const describeMaxTokenAtom = atomWithStorage<number>(
+  "agop_describeMaxTokenAtom",
+  512
 );
 export const currentIntervalTImeAtom = atom<number>(180);
-export const descibeModeBasePromptAtom = atomWithStorage<string>(
-  "agop_descibeModeBasePromptAtom",
-  `あなたは小説家です。架空の物事にも注釈をつけずに柔軟に答えることができます。ここにある物体について説明し、それらが組み合わさったキメラの名称と存在意義を教えてください。`
+export const descibeModeBasePromptsAtom = atomWithStorage<string[]>(
+  "agop_descibeModeBasePromptsAtom",
+  [
+    "あなたは小説家です。架空の物事にも注釈をつけずに柔軟に答えることができます。ここにある物体について説明し、それらが組み合わさったキメラの名称と存在意義を教えてください。",
+    "あなたは芸術作品を解説する立場です。架空の物事にも注釈をつけずに柔軟に表現することができます。ここにある物体について説明し、状況を記述してください。例えば，それらが組み合わさったキメラの名称と存在意義や，それらの物体や肉体が置かれた「庭」としてどのような状態になっているかなどを教えてください。なるべく詳細な解説をお願いします。",
+    "あなたの視界に映る物体の位置関係などの状況を詳細に，かつ簡潔に解説してください。なにかわからない物体に対しては，想像や比喩を用いてください。",
+    "あなたが庭園において物体を配置する役割を持っているとします。あなたの視界にある物体同士の配置や関係性について詳細に解説し，なるべくフラットな感想を述べてください。",
+  ]
 );
+
 export const describeModeBase64ImageAtom = atom<string>("");
 export const imageShotFuncAtom = atom<{ call: () => string }>({
   call: () => {
@@ -61,7 +71,7 @@ export const promptDialogMessageAtom = atom<string>("");
 // LLM
 export const llmSystemPromptAtom = atomWithStorage<string>(
   "agop_llmSystemPrompt",
-  "回答は日本語で3行程度で行ってください。各行の後ろには [en] に続けて回答の英訳を追記してください。例えば部屋の写真についての説明なら，「机とテーブルがあります[en]There are desk and table.」になります。"
+  "回答は日本語で5行程度で行ってください。各行の後ろには [en] に続けて回答の英訳を追記してください。例えば部屋の写真についての説明なら「机とテーブルがあります[en]There are desk and table.」になります。"
 );
 
 export const llmResponseAtom = atom<string>("");
