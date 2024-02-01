@@ -39,23 +39,27 @@ const LmResponseWrap = ({
 
   return (
     <div className="grid grid-rows-2 gap-8 min-h-full">
-      <p
-        className="row-span-1 text-5xl font-serif animate-in fade-in-100 opacity-75"
-        style={{
-          whiteSpace: "pre-wrap",
-        }}
-      >
-        {currentResponseJa}
-      </p>
-      {currentResponseEn && (
+      <article className="row-span-1 flex flex-col justify-center">
         <p
-          className="row-span-1 text-5xl font-serif animate-in fade-in-100 opacity-75"
+          className="text-6xl font-serif animate-in fade-in-100"
           style={{
             whiteSpace: "pre-wrap",
           }}
         >
-          {currentResponseEn}
+          {currentResponseJa}
         </p>
+      </article>
+      {currentResponseEn && (
+        <article className="row-span-1 flex flex-col justify-center">
+          <p
+            className="text-5xl font-serif animate-in fade-in-100"
+            style={{
+              whiteSpace: "pre-wrap",
+            }}
+          >
+            {currentResponseEn}
+          </p>
+        </article>
       )}
     </div>
   );

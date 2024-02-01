@@ -22,11 +22,11 @@ export const buildRandomPrompts = (inputLabels: string[]) => {
  */
 export const buildPreviousResponseAsPrompt = (response: string) => {
   return response !== undefined && response.length > 0
-    ? "あなたは先程「" +
+    ? "先程あなたが「" +
         response
           .split("\n")
           .map((line) => line.split("[en]")[0])
-          .join("\n") +
-        "」と言っていたことも踏まえて表現してください。"
+          .join("") +
+        "」と言っていたことも踏まえ、比較したりしながら表現してください。"
     : "";
 };
