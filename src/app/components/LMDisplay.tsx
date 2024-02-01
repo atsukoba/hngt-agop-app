@@ -128,7 +128,9 @@ export default function LMDisplay({
   useEffect(() => {
     window.addEventListener("beforeunload", () => speechSynthesis.cancel());
     speakStop();
-    setInternalResposes(llmResponse.split(separateString));
+    setInternalResposes(
+      llmResponse.split(separateString).filter((t) => t !== "")
+    );
   }, [llmResponse]);
 
   useEffect(() => {
