@@ -131,6 +131,7 @@ export default function LMDisplay({
     setInternalResposes(
       llmResponse.split(separateString).filter((t) => t !== "")
     );
+    setCurrentReadingIdx(0);
   }, [llmResponse]);
 
   useEffect(() => {
