@@ -10,9 +10,9 @@ export default function TimerProgress() {
   const currentIntervalTIme = useAtomValue(currentIntervalTImeAtom);
   const descIntervalTime = useAtomValue(describeIntervalSecAtom);
   return (
-    <div className="absolute top-0 right-0 p-4">
+    <div className="absolute top-0 left-0 p-4">
       <div
-        className={`flex flex-col gap-2 bg-black bg-opacity-50 rounded-lg p-4 ${
+        className={`flex flex-col gap-2 bg-black bg-opacity-70 rounded-lg p-4 ${
           currentIntervalTIme == 0 ? "text-error" : "text-accent"
         }`}
       >
@@ -24,12 +24,12 @@ export default function TimerProgress() {
               "--value": Math.floor(
                 100 * (currentIntervalTIme / descIntervalTime)
               ),
-              "--size": "5rem",
+              "--size": "6rem",
             } as any
           }
           role="progressbar"
         >
-          <span className="countdown font-mono text-2xl">
+          <span className="countdown font-mono text-3xl">
             <span style={{ "--value": currentIntervalTIme } as any}></span>
           </span>
         </div>
