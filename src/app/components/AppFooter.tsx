@@ -11,6 +11,7 @@ import {
   currentCamerasAtom,
   currentIntervalTImeAtom,
   descibeModeBasePromptsAtom,
+  descibePromptsSelectedIndexAtom,
   describeIntervalSecAtom,
   describeMaxTokenAtom,
   describeModeBase64ImageAtom,
@@ -50,6 +51,9 @@ export default function AppFooter({
   const descIntervalTime = useAtomValue(describeIntervalSecAtom);
   const describeMaxToken = useAtomValue(describeMaxTokenAtom);
   const descPrompts = useAtomValue(descibeModeBasePromptsAtom);
+  const [descPromptSelectedIdx, setDescPromptSelectedIdx] = useAtom(
+    descibePromptsSelectedIndexAtom
+  );
   const systemPrompt = useAtomValue(llmSystemPromptAtom);
   const webhook = useAtomValue(discordWebhookUrlAtom);
 
@@ -87,8 +91,7 @@ export default function AppFooter({
     if (image) {
       setLoadingMessage(LoadingMessages.GENERATING);
       // randomly select a prompt
-      const descPrompt =
-        descPrompts[Math.floor(Math.random() * descPrompts.length)];
+      const descPrompt = descPrompts[descPromptSelectedIdx];
       // trigger generation
       const promptSend = [
         systemPrompt,
@@ -164,9 +167,28 @@ export default function AppFooter({
         </select>
         {gpt4mode ? (
           <div className="flex-grow flex flex-row justify-end gap-4">
+            <div className="prompt_selector flex flex-row gap-2 items-center">
+              <span className="label-text mr-2">Prompts</span>
+              {descPrompts.map((p, i) => (
+                <div
+                  className="tooltip tooltip-top flex items-center"
+                  data-tip={p}
+                >
+                  <input
+                    type="radio"
+                    name={`radio__prompt${i}`}
+                    className="radio radio-accent"
+                    checked={i === descPromptSelectedIdx}
+                    onChange={() => setDescPromptSelectedIdx(i)}
+                  />
+                </div>
+              ))}
+            </div>
             <div className="form-control">
               <label className="cursor-pointer label">
-                <span className="label-text mr-2">Auto Mode</span>
+                <span className="label-text mr-2 font-mono">
+                  Auto: {isAutoDescribeOn ? "入" : "切"}
+                </span>
                 <input
                   type="checkbox"
                   className="toggle toggle-accent toggle-lg"
@@ -176,22 +198,6 @@ export default function AppFooter({
                   }}
                 />
               </label>
-            </div>
-            <div className="w-12">
-              <div
-                className="radial-progress text-accent"
-                style={
-                  {
-                    "--value": Math.floor(
-                      100 * (currentIntervalTIme / descIntervalTime)
-                    ),
-                    "--size": "3rem",
-                  } as any
-                }
-                role="progressbar"
-              >
-                {currentIntervalTIme}
-              </div>
             </div>
             <div>
               <button
