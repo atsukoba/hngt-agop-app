@@ -22,6 +22,7 @@ import {
 } from "@/utils/states";
 import { labels } from "@/yolo/label";
 import { useAtom, useAtomValue, useSetAtom } from "jotai/react";
+import { useResetAtom } from "jotai/utils";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -277,6 +278,7 @@ const YoloModeSettings = () => {
 
 const GPT4ImageCaptioningModeSettings = () => {
   const [prompts, setPrompts] = useAtom(descibeModeBasePromptsAtom);
+  const resetPrompts = useResetAtom(descibeModeBasePromptsAtom);
   const [descInterval, setDescInterval] = useAtom(describeIntervalSecAtom);
   const [maxToken, setMaxToken] = useAtom(describeMaxTokenAtom);
 
@@ -324,8 +326,22 @@ const GPT4ImageCaptioningModeSettings = () => {
           Prompt / 画像キャプション生成のためのプロンプト
         </h3>
         <p className="mb-8">
-          ランダムに一つのプロンプトが選択されて、画像説明の生成を行います。
+          画像説明の生成を行うためのプロンプト。画面下部で選択されているものが使用されます。
         </p>
+        <div className="mb-8">
+          <button
+            className="btn btn-primary btn-md"
+            onClick={(e) => {
+              resetPrompts();
+              alert(
+                "Prompts reset to default / プロンプトをリセットしました。"
+              );
+            }}
+          >
+            <span className="icon icon-refresh mr-2"></span>
+            Reset / リセット
+          </button>
+        </div>
         {prompts.map((prompt, idx) => (
           <>
             <p className="text-sm mb-4">Prompt {idx + 1}</p>
