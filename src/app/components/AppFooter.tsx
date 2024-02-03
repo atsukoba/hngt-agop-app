@@ -2,7 +2,7 @@
 
 import PromptDisplay from "@/app/components/PromptDisplay";
 import { buildPreviousResponseAsPrompt } from "@/prompts/builder";
-import { updateDescribeResponse } from "@/utils/api";
+import { updateChatResponse, updateDescribeResponse } from "@/utils/api";
 import { LoadingMessages } from "@/utils/consts";
 import { postDiscordWebhook } from "@/utils/logging";
 import {
@@ -17,6 +17,7 @@ import {
   describeModeBase64ImageAtom,
   discordWebhookUrlAtom,
   imageShotFuncAtom,
+  initializePromptAtom,
   isAutoDescribeOnAtom,
   isCameraOn,
   llmPreviousResponseAtom,
@@ -54,6 +55,7 @@ export default function AppFooter({
   const [descPromptSelectedIdx, setDescPromptSelectedIdx] = useAtom(
     descibePromptsSelectedIndexAtom
   );
+  const initPrompt = useAtomValue(initializePromptAtom);
   const systemPrompt = useAtomValue(llmSystemPromptAtom);
   const webhook = useAtomValue(discordWebhookUrlAtom);
 
@@ -153,7 +155,7 @@ export default function AppFooter({
           Screen
         </button>
         <select
-          className="select select-accent w-full max-w-sm"
+          className="select select-accent w-full max-w-xs"
           value={currentCamera ? cameras.indexOf(currentCamera) : 0}
           onChange={(e) =>
             setCamera(cameras[e.target.value as unknown as number])
@@ -166,7 +168,29 @@ export default function AppFooter({
           ))}
         </select>
         {gpt4mode ? (
-          <div className="flex-grow flex flex-row justify-end gap-4">
+          <div className="flex-grow flex flex-row items-center justify-end gap-4">
+            <button
+              className="btn btn-warning btn-outline btn-sm"
+              onClick={() => {
+                if (confirm("AI探索者を起動しますか?")) {
+                  setLoadingMessage(LoadingMessages.GENERATING);
+                  updateChatResponse(
+                    initPrompt,
+                    token,
+                    setLlmsResponse,
+                    "gpt-3.5-turbo-instruct"
+                  )
+                    .then((r) => {
+                      console.log(r);
+                    })
+                    .finally(() => {
+                      setLoadingMessage(undefined);
+                    });
+                }
+              }}
+            >
+              Keyphrase Gen
+            </button>
             <div className="prompt_selector flex flex-row gap-2 items-center">
               <span className="label-text mr-2">Prompts</span>
               {descPrompts.map((p, i) => (

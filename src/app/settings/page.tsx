@@ -8,6 +8,7 @@ import {
   describeMaxTokenAtom,
   discordWebhookUrlAtom,
   inferenceIntervalAtom,
+  initializePromptAtom,
   iouThreshold,
   isCameraOn,
   labelsJaLabelMapAtom,
@@ -457,6 +458,7 @@ export default function SettingPage() {
   const [voiceIndex, setVoiceIndex] = useAtom(voiceIndexAtom);
 
   const [systemPrompt, setSystemPrompt] = useAtom(llmSystemPromptAtom);
+  const [initializePrompt, setInitializePrompt] = useAtom(initializePromptAtom);
 
   useEffect(() => {
     const mode = searchParams.get("mode");
@@ -617,6 +619,20 @@ export default function SettingPage() {
             className="input input-bordered w-full"
             value={webhook}
             onChange={(e) => setWebhook(e.target.value)}
+          />
+        </div>
+
+        <div className="divider"></div>
+
+        <h3 className="font-bold text-xl mb-4">Initialize Prompt</h3>
+        <div className="mb-8">
+          <p className="mb-8">パフォーマンス開始時に用いるプロンプトです。</p>
+          <input
+            type="url"
+            placeholder="input Webhook URL"
+            className="input input-bordered w-full"
+            value={initializePrompt}
+            onChange={(e) => setInitializePrompt(e.target.value)}
           />
         </div>
 

@@ -85,6 +85,10 @@ export const usePreviousResponseAtom = atomWithStorage<boolean>(
 // OpenAI API
 export const apiKeyAtom = atomWithStorage<string>("agop_apiKeyAtom", "");
 // chat
+export const initializePromptAtom = atomWithStorage<string>(
+  "agop_initializePromptAtom",
+  "人間とはなんですか?10行程度で改行を入れて、説明してください。"
+);
 export const modelNameAtom = atomWithStorage<string>(
   "agop_modelNameAtom",
   "gpt-3.5-turbo-0301"
