@@ -87,7 +87,7 @@ export const apiKeyAtom = atomWithStorage<string>("agop_apiKeyAtom", "");
 // chat
 export const initializePromptAtom = atomWithStorage<string>(
   "agop_initializePromptAtom",
-  "人間とはなんですか?10行程度で改行を入れて、説明してください。"
+  "人間とはなんですか？日本語で10行程度で、各行に改行を入れてください。"
 );
 export const modelNameAtom = atomWithStorage<string>(
   "agop_modelNameAtom",
