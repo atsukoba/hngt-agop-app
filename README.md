@@ -19,6 +19,12 @@ In this garden, artifacts, natural objects, and bodies exist in equal measure, e
 
 <img width="1659" alt="architecture" src="https://github.com/atsukoba/hngt-agop-app/assets/19545249/ed0e301b-21a0-48b9-8e24-14ac4a6869b5">
 
+![image](https://github.com/atsukoba/hngt-agop-app/assets/19545249/0ea4d7fa-1076-4c19-92a0-3bc62b023d14)
+
+### Settings
+
+![agop2024 vercel app_settings_mode=gpt4](https://github.com/atsukoba/hngt-agop-app/assets/19545249/ce0a7c0c-02ae-40d5-9960-f3a31e5cab2f)
+
 ---
 
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
